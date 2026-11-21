@@ -107,7 +107,14 @@ before the entries were added.
 
 ### Open items
 
-- **JDK for Robolectric (needs your decision).** Gradle here runs on JDK 25, and Robolectric
+- ~~**JDK for Robolectric.**~~ Resolved 2026-11-21: the Gradle daemon is pinned to JDK 21 in
+  `android/gradle/gradle-daemon-jvm.properties`, and CI's `android-test` job now sets up
+  Temurin 21. A plain `./gradlew :app:testDebugUnitTest` passes all 79 tests from a JDK 25 shell.
+  The file was written by hand: `./gradlew updateDaemonJvm --jvm-version=21` fails with "Toolchain
+  download repositories have not been configured", because it also writes JDK download URLs,
+  and those need a toolchain resolver plugin (e.g. foojay) that this build does not use. Without
+  URLs, a machine with no JDK 21 installed gets a clear Gradle error instead of an automatic
+  download. Original note: Gradle here runs on JDK 25, and Robolectric
   4.14.1 fails with `Unsupported class file major version 69`. I tried three times (JDK 22
   run, which works; a JUnit `@BeforeClass` assumption, which compiled only after a fix and then
   skipped just 1 of 6). Then I stopped, per the three-failure rule, and removed the guard. To run the full
@@ -125,8 +132,7 @@ before the entries were added.
 
 - **Android Studio:** open `android/`, let Gradle sync, choose the `app` run configuration
   (created automatically for the application module) and run on an emulator or device (API 26+).
-  Set Gradle JDK (Settings → Build Tools → Gradle) to 17–24 if you want to run the Robolectric
-  tests from the IDE.
+  The Gradle daemon JVM is pinned to 21 by `gradle/gradle-daemon-jvm.properties`.
 - **Xcode:** `cd ios && xcodegen generate && open BeatSide.xcodeproj`, choose the `BeatSide`
   scheme and an iPhone simulator, then Run (⌘R). ⌘U runs the unit tests.
 - **What to expect:** the root menu ("BeatSide" title, Music highlighted). Drag a finger around
