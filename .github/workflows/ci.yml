@@ -33,13 +33,19 @@ jobs:
         working-directory: ios
         run: |
           set -o pipefail
-          # Pick the first available iPhone simulator instead of hard-coding a model.
-          DEVICE=$(xcrun simctl list devices available | grep -m1 -oE 'iPhone [^(]+' | sed 's/ *$//')
-          echo "Using simulator: $DEVICE"
+          # Pick an iPhone on the newest installed iOS runtime, by id. A name-only destination
+          # means OS:latest and fails when that model is missing from the latest runtime.
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((k for k in data if "iOS" in k), key=lambda k: [int(x) for x in k.rsplit("iOS-", 1)[1].split("-")])
+          phones = [d for d in data[ios[-1]] if d["name"].startswith("iPhone")]
+          print(phones[0]["udid"])')
+          echo "Using simulator: $DEVICE_ID"
           xcodebuild test \
             -project BeatSide.xcodeproj \
             -scheme BeatSide \
-            -destination "platform=iOS Simulator,name=$DEVICE"
+            -destination "id=$DEVICE_ID"
 
   ios-ui-test:
     name: iOS UI/accessibility tests
@@ -55,9 +61,16 @@ jobs:
         working-directory: ios
         run: |
           set -o pipefail
-          DEVICE=$(xcrun simctl list devices available | grep -m1 -oE 'iPhone [^(]+' | sed 's/ *$//')
-          echo "Using simulator: $DEVICE"
+          # Pick an iPhone on the newest installed iOS runtime, by id. A name-only destination
+          # means OS:latest and fails when that model is missing from the latest runtime.
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((k for k in data if "iOS" in k), key=lambda k: [int(x) for x in k.rsplit("iOS-", 1)[1].split("-")])
+          phones = [d for d in data[ios[-1]] if d["name"].startswith("iPhone")]
+          print(phones[0]["udid"])')
+          echo "Using simulator: $DEVICE_ID"
           xcodebuild test \
             -project BeatSide.xcodeproj \
             -scheme BeatSideUITests \
-            -destination "platform=iOS Simulator,name=$DEVICE"
+            -destination "id=$DEVICE_ID"
