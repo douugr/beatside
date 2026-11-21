@@ -39,6 +39,18 @@
     <string name="a11y_wheel_previous">Previous button</string>
     <string name="a11y_wheel_play_pause">Play/Pause button</string>
 
+    <!-- Screen-reader label of the whole wheel and its four actions (FR-031) -->
+    <string name="a11y_wheel">Wheel</string>
+    <string name="a11y_action_next">Next item</string>
+    <string name="a11y_action_previous">Previous item</string>
+    <string name="a11y_action_select">Select</string>
+    <string name="a11y_action_back">Go back</string>
+
+    <!-- Screen-reader row labels and announcements (FR-028, FR-031) -->
+    <string name="a11y_row_submenu">%1$s, submenu</string>
+    <string name="a11y_row_toggle">%1$s, %2$s</string>
+    <string name="a11y_screen_and_row">%1$s, %2$s</string>
+
     <!-- Label printed on the top of the wheel ring -->
     <string name="wheel_menu">MENU</string>
 </resources>

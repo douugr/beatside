@@ -15,6 +15,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +34,9 @@ import dev.douglasneto.beatside.settings.WheelSettings
  * The display: a title bar with the current node's title, then its content. Submenus show
  * their rows; leaf screens are drawn by [RouteScreen].
  */
+/** Test tag of the title bar text, used by UI tests to read the current screen's title. */
+const val LcdTitleTestTag = "lcd_title"
+
 @Composable
 fun LcdScreen(state: MenuState, settings: WheelSettings, modifier: Modifier = Modifier) {
     val frame = state.current
@@ -53,6 +57,7 @@ fun LcdScreen(state: MenuState, settings: WheelSettings, modifier: Modifier = Mo
         ) {
             BasicText(
                 stringResource(MenuStrings.titleRes(frame.node)),
+                modifier = Modifier.testTag(LcdTitleTestTag),
                 style = TextStyle(color = LcdColors.Text, fontSize = 15.sp, fontWeight = FontWeight.Bold),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

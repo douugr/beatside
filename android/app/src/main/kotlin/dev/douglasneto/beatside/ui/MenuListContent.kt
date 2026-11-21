@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -64,6 +66,8 @@ fun MenuListContent(
 
 @Composable
 private fun MenuRow(child: MenuNode, selected: Boolean, settings: WheelSettings) {
+    // FR-028: one screen-reader label with the name plus the role or state.
+    val rowLabel = MenuAccessibility.rowLabel(child, settings, rememberAccessibilityStrings())
     val color = if (selected) LcdColors.SelectedText else LcdColors.Text
     val style = TextStyle(color = color, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
     val suffix = when (child) {
@@ -75,6 +79,7 @@ private fun MenuRow(child: MenuNode, selected: Boolean, settings: WheelSettings)
         modifier = Modifier
             .fillMaxWidth()
             .height(RowHeight)
+            .semantics(mergeDescendants = true) { contentDescription = rowLabel }
             .then(if (selected) Modifier.background(LcdColors.Selection) else Modifier)
             .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically,

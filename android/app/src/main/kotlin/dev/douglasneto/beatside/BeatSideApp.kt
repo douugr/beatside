@@ -24,7 +24,11 @@ import dev.douglasneto.beatside.menu.MenuEffect
 import dev.douglasneto.beatside.menu.MenuNavigator
 import dev.douglasneto.beatside.menu.MenuState
 import dev.douglasneto.beatside.settings.WheelSettings
+import dev.douglasneto.beatside.ui.Announcer
 import dev.douglasneto.beatside.ui.LcdScreen
+import dev.douglasneto.beatside.ui.MenuAccessibility
+import dev.douglasneto.beatside.ui.rememberAccessibilityStrings
+import dev.douglasneto.beatside.ui.rememberViewAnnouncer
 import dev.douglasneto.beatside.wheel.ClickWheel
 import dev.douglasneto.beatside.wheel.FeedbackPlayer
 import dev.douglasneto.beatside.wheel.WheelButton
@@ -41,14 +45,23 @@ private val Body = Brush.verticalGradient(listOf(Color(0xFFFAFAF8), Color(0xFFE3
  * through [MenuNavigator]. The system back gesture is a MENU press while there is a level to go
  * back to (FR-014); at the root it is left to the system.
  *
- * [feedback] defaults to the real click sound and haptics; tests pass fakes.
+ * After every event that changes the selection, the screen or a setting, the new row's or
+ * screen's label is announced to screen readers (FR-031); this is a no-op when none is running.
+ *
+ * [feedback] and [announcer] default to the real ones; tests pass fakes.
  */
 @Composable
-fun BeatSideApp(feedback: FeedbackPlayer = rememberFeedbackPlayer()) {
+fun BeatSideApp(
+    feedback: FeedbackPlayer = rememberFeedbackPlayer(),
+    announcer: Announcer = rememberViewAnnouncer(),
+) {
+    val a11yStrings = rememberAccessibilityStrings()
     var menuState by remember { mutableStateOf(MenuState.root(BeatSideMenu.root)) }
     var settings by remember { mutableStateOf(WheelSettings()) }
 
     fun onWheelEvent(event: WheelEvent) {
+        val stateBefore = menuState
+        val settingsBefore = settings
         val result = MenuNavigator.reduce(menuState, event)
         menuState = result.state
         when (val effect = result.effect) {
@@ -56,6 +69,8 @@ fun BeatSideApp(feedback: FeedbackPlayer = rememberFeedbackPlayer()) {
             // Next / Previous / Play-Pause and long press have no effect in this slice (FR-011).
             is MenuEffect.Unhandled, null -> Unit
         }
+        MenuAccessibility.announcement(stateBefore, menuState, settingsBefore, settings, a11yStrings)
+            ?.let(announcer::announce)
     }
 
     BackHandler(enabled = menuState.canGoBack) {

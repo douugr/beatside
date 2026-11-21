@@ -3,12 +3,16 @@ package dev.douglasneto.beatside.wheel
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -24,6 +28,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +57,11 @@ private val Glyph = Color(0xFF8C8C88)
  * [WheelTracker], plays feedback for each one with the current [settings], then reports it
  * through [onEvent]. It knows nothing about menus or screens (Constitution II).
  *
+ * For screen readers (FR-027, FR-031) the wheel is labelled and exposes four custom actions,
+ * "Next item", "Previous item", "Select" and "Go back", which dispatch the same events as a
+ * tick, a center press and a MENU press, through the same feedback path. Each of the five buttons
+ * is also a labelled, clickable zone.
+ *
  * [feedback] defaults to the real click sound and view haptics; tests pass fakes.
  */
 @Composable
@@ -67,6 +83,13 @@ fun ClickWheel(
     }
     val menuLabel = stringResource(R.string.wheel_menu)
     val textMeasurer = rememberTextMeasurer()
+    val wheelLabel = stringResource(R.string.a11y_wheel)
+    val actions = listOf(
+        stringResource(R.string.a11y_action_next) to WheelEvent.Tick(+1),
+        stringResource(R.string.a11y_action_previous) to WheelEvent.Tick(-1),
+        stringResource(R.string.a11y_action_select) to WheelEvent.Press(WheelButton.Center),
+        stringResource(R.string.a11y_action_back) to WheelEvent.Press(WheelButton.Menu),
+    ).map { (label, event) -> CustomAccessibilityAction(label) { dispatch(event); true } }
 
     Box(
         modifier
@@ -123,6 +146,41 @@ fun ClickWheel(
                     label,
                     topLeft = Offset(center.x - label.size.width / 2f, center.y - r * 0.68f - label.size.height / 2f),
                 )
+            }
+            .semantics {
+                contentDescription = wheelLabel
+                customActions = actions
+            },
+    ) {
+        ButtonZone(Alignment.Center, 0.36f, 0.36f, stringResource(R.string.a11y_wheel_center)) { dispatch(WheelEvent.Press(WheelButton.Center)) }
+        ButtonZone(Alignment.TopCenter, 0.4f, 0.3f, stringResource(R.string.a11y_wheel_menu)) { dispatch(WheelEvent.Press(WheelButton.Menu)) }
+        ButtonZone(Alignment.CenterEnd, 0.3f, 0.4f, stringResource(R.string.a11y_wheel_next)) { dispatch(WheelEvent.Press(WheelButton.Next)) }
+        ButtonZone(Alignment.BottomCenter, 0.4f, 0.3f, stringResource(R.string.a11y_wheel_play_pause)) { dispatch(WheelEvent.Press(WheelButton.PlayPause)) }
+        ButtonZone(Alignment.CenterStart, 0.3f, 0.4f, stringResource(R.string.a11y_wheel_previous)) { dispatch(WheelEvent.Press(WheelButton.Previous)) }
+    }
+}
+
+/**
+ * An invisible, semantics-only area over one button (FR-027). It has no pointer input, so touches
+ * still reach the wheel's gesture handler; screen readers can focus and activate it.
+ */
+@Composable
+private fun BoxScope.ButtonZone(
+    alignment: Alignment,
+    widthFraction: Float,
+    heightFraction: Float,
+    label: String,
+    onActivate: () -> Unit,
+) {
+    Box(
+        Modifier
+            .align(alignment)
+            .fillMaxWidth(widthFraction)
+            .fillMaxHeight(heightFraction)
+            .semantics {
+                contentDescription = label
+                role = Role.Button
+                onClick { onActivate(); true }
             },
     )
 }
