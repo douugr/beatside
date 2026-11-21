@@ -1,0 +1,50 @@
+# ---------- OS / editors ----------
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.iml
+
+# ---------- Secrets ----------
+# Never commit API keys, keystores or local SDK paths.
+local.properties
+secrets.properties
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+.env
+.env.*
+
+# ---------- Android (android/) ----------
+.gradle/
+.kotlin/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+android/app/release/
+android/app/debug/
+
+# ---------- iOS (ios/) ----------
+# The Xcode project is generated from ios/project.yml by XcodeGen.
+ios/*.xcodeproj/
+ios/*.xcworkspace/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+.build/
+.swiftpm/
+Packages/
+Package.resolved
