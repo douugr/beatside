@@ -289,3 +289,81 @@ as soon as they compiled.
    fire. Flip back to Ring and clicks should return.
 8. **Settings are session-only (FR-030):** turn Clicker off, kill and relaunch the app. Clicker
    should be On again.
+
+## Run of 2026-11-21: T036–T043 (Phase 6, US4)
+
+Stopped after T043 as instructed. Phase 7 (T044+) has not been started.
+
+### Tasks done
+
+| Task(s) | Result | Commit |
+|---|---|---|
+| T036–T039 | Android `ClockFormat` (pure), `ClockScreen`, `AboutScreen`; `RouteScreen` routes Clock/About to real screens and everything else to Coming Soon; English strings for About and the wheel button accessibility labels. | 868bb4e |
+| T040–T043 | iOS `ClockFormat` (pure), `ClockView`, `AboutInfo`, `AboutView`; `RouteView` wired the same way; the same keys added to the String Catalog. | b04c8bb |
+
+Tests written first and seen failing:
+- Android: `ClockFormatTest` (7, unresolved type), then 4 `BeatSideAppTest` cases for real Clock/About screens. Two "stays Coming soon" guards passed from the start.
+- iOS: `ClockFormatTests` / `AboutInfoTests` (unresolved types), `MenuStringsTests` (the 7 new keys missing from the catalog), and `LeafScreensUITests` (Clock/About failed; the 2 placeholder guards passed).
+
+### Test counts at the Phase 6 checkpoint
+
+| Platform | Suite | Tests | Result |
+|---|---|---|---|
+| Android | `./gradlew :app:testDebugUnitTest` | 117: WheelTracker 42, MenuNavigator 16, WheelSettings 5, ListScroll 7, MenuStrings 3, FeedbackPlayer 9, ClickWheel 10, BeatSideApp 18, ClockFormat 7 | all pass |
+| iOS | `BeatSide` scheme (unit) | 94: WheelTracker 42, MenuNavigator 16, WheelSettings 5, MenuStrings 4, FeedbackPlayer 11, WheelTouchView 5, ClockFormat 8 (one parameterized over 9 templates), AboutInfo 3 | all pass |
+| iOS | `BeatSideUITests` scheme | 12: Navigation 6, Settings 2, LeafScreens 4 | all pass (iPhone 16, iOS 18.1 sim) |
+
+### How the requirements are met
+
+- **Clock pattern decision is pure and tested** on both platforms: `ClockFormat.pattern` picks
+  `HH:mm:ss` (24-hour) or `hh:mm:ss a` (12-hour), and `format`/`string` apply it for a locale.
+  On iOS, `ClockFormat.uses24Hour(hourTemplate:)` also decides 12 vs 24 from the locale's `"j"`
+  template (H/k vs h/K, quoted text ignored), so locales that put AM/PM first or use day periods
+  are handled.
+- **Thin observers.** Android: one `BroadcastReceiver` (TIME_CHANGED, which Android sends when the
+  12/24-hour setting is switched, plus TIMEZONE_CHANGED and LOCALE_CHANGED) re-reads
+  `DateFormat.is24HourFormat`. iOS: `.onReceive(NSLocale.currentLocaleDidChangeNotification)`
+  re-reads the template. Both tick on second boundaries.
+  `BeatSideAppTest` switches `TIME_12_24` from 12 to 24 while the Clock is open and checks the
+  display follows. iOS has no automated equivalent: XCUITest can't change the system setting.
+- **Version from the build**, never a literal: `BuildConfig.VERSION_NAME` (Android `versionName`)
+  and `CFBundleShortVersionString` (iOS `MARKETING_VERSION`), both currently 0.1.0.
+- **Routes:** Clock and About are real; Music items, Stopwatch, Games, Shuffle Songs and Now
+  Playing show Coming Soon.
+
+### Decisions and deviations to review
+
+1. **Author string: "by Douglas Rodrigues Neto".** FR-025 requires an author but the spec
+   doesn't give one; the name comes from the prototype's About screen
+   (`prototype/wheel-and-menus`, `LcdScreen.kt`). The prototype's tagline and "© 2026" line
+   were not carried over. Change `about_author` on both platforms if you want different wording.
+2. **No `NowPlayingScreen.kt` / `NowPlayingView.swift`.** T037/T041 ask for them, but your
+   instructions say Now Playing keeps the Coming Soon placeholder, so `Route.NowPlaying` maps to
+   `ComingSoonScreen`/`ComingSoonView` and no extra file exists (Constitution VII).
+3. **iOS uses the same fixed patterns as Android** instead of the `Date.FormatStyle` that T040
+   mentions. That keeps the "which pattern for which setting" decision in one pure, tested
+   function, as you asked. The AM/PM symbols still come from the current locale.
+4. **12-hour times keep the leading zero** (`07:05:09 PM`), per the `hh:mm:ss a` pattern in T036.
+   Switch to `h:mm:ss a` in both `ClockFormat`s if you prefer `7:05:09 PM`.
+5. **Wheel button accessibility labels added now (English)**, per T039: `a11y_wheel_center`,
+   `a11y_wheel_menu`, `a11y_wheel_next`, `a11y_wheel_previous`, `a11y_wheel_play_pause`. They're
+   unused until Phase 7 (T045/T046). Android's resource shrinker may drop them from release builds
+   until then, which is harmless.
+
+### What to try by hand
+
+1. **Clock:** Extras → Clock. You should see the current time, with seconds advancing once a
+   second and no jitter in width.
+2. **12/24 switch while open.** Android: Settings → System → Date & time → "Use 24-hour format".
+   iOS: Settings → General → Date & Time → "24-Hour Time". Leave the Clock open and toggle. On
+   return the display should already use the new format (e.g. `19:05:09` ↔ `07:05:09 PM`). I have
+   **not** checked iOS by hand: the code relies on iOS posting the locale-change notification and
+   on the `"j"` template reflecting the switch.
+3. **Time zone change** with the Clock open (set time automatically off, pick another zone): the
+   hour should change within a second.
+4. **About:** Settings → About should show "BeatSide", "Version 0.1.0", "by Douglas Rodrigues Neto".
+   Bump `versionName` / `MARKETING_VERSION`, rebuild, and the screen should follow.
+5. **Placeholders:** each Music item, Stopwatch, Games, Shuffle Songs and Now Playing should show "Coming soon".
+   MENU returns to the parent with the same row highlighted (US4-4).
+6. **Wheel on leaf screens:** rotating on Clock/About should still click and buzz but not
+   change anything; MENU goes back.
