@@ -1,6 +1,11 @@
 package dev.douglasneto.beatside
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -188,5 +193,84 @@ class BeatSideAppTest {
         feedbackLog.clear()
         rotate(1) // About: click and haptic again
         assertEquals(listOf("click", "tick-haptic"), feedbackLog)
+    }
+
+    // US4 leaf screens (T036-T038): Clock and About are real; every other leaf is Coming soon.
+
+    private val time24 = Regex("""\d{2}:\d{2}:\d{2}""")
+    private val time12 = Regex("""\d{2}:\d{2}:\d{2} (AM|PM)""")
+
+    private fun textMatching(regex: Regex) = SemanticsMatcher("text matches $regex") { node ->
+        node.config.getOrNull(SemanticsProperties.Text)?.any { regex.matches(it.text) } == true
+    }
+
+    private fun showsTime(regex: Regex) = compose.onNode(textMatching(regex)).assertExists()
+
+    private fun setHourFormat(value: String) {
+        Settings.System.putString(compose.activity.contentResolver, Settings.System.TIME_12_24, value)
+    }
+
+    private fun openClock() {
+        rotate(1) // Extras
+        tapCenter()
+        tapCenter() // Clock
+        shows("Clock")
+    }
+
+    @Test fun `Clock shows the time in 24-hour format when the device uses 24-hour`() {
+        setHourFormat("24")
+        openClock()
+        showsTime(time24)
+        hides("Coming soon")
+    }
+
+    @Test fun `Clock shows the time in 12-hour format when the device uses 12-hour`() {
+        setHourFormat("12")
+        openClock()
+        showsTime(time12)
+    }
+
+    @Test fun `Clock switches format while open when the 12-24 setting changes`() {
+        setHourFormat("12")
+        openClock()
+        showsTime(time12)
+        setHourFormat("24")
+        compose.runOnUiThread { compose.activity.sendBroadcast(Intent(Intent.ACTION_TIME_CHANGED)) }
+        org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+        compose.waitForIdle()
+        showsTime(time24)
+    }
+
+    @Test fun `About shows the app name, the build version and the author`() {
+        rotate(2) // Settings
+        tapCenter()
+        rotate(2) // About
+        tapCenter()
+        shows("BeatSide")
+        shows("Version ${BuildConfig.VERSION_NAME}")
+        shows("by Douglas Rodrigues Neto")
+        hides("Coming soon")
+    }
+
+    @Test fun `Stopwatch and Games stay Coming soon`() {
+        rotate(1) // Extras
+        tapCenter()
+        rotate(1) // Stopwatch
+        tapCenter()
+        shows("Coming soon")
+        tapMenu()
+        rotate(1) // Games
+        tapCenter()
+        shows("Coming soon")
+    }
+
+    @Test fun `Shuffle Songs and Now Playing stay Coming soon`() {
+        rotate(3) // Shuffle Songs
+        tapCenter()
+        shows("Coming soon")
+        tapMenu()
+        rotate(1) // Now Playing
+        tapCenter()
+        shows("Coming soon")
     }
 }

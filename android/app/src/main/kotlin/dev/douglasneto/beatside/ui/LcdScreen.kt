@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import dev.douglasneto.beatside.menu.MenuNode
 import dev.douglasneto.beatside.menu.MenuState
 import dev.douglasneto.beatside.menu.Route
+import dev.douglasneto.beatside.ui.screens.AboutScreen
+import dev.douglasneto.beatside.ui.screens.ClockScreen
 import dev.douglasneto.beatside.ui.screens.ComingSoonScreen
 import dev.douglasneto.beatside.settings.WheelSettings
 
@@ -69,11 +71,13 @@ fun LcdScreen(state: MenuState, settings: WheelSettings, modifier: Modifier = Mo
     }
 }
 
-/** Draws the leaf screen for [route]. Every route is a placeholder until Phase 6 (T038). */
+/** Draws the leaf screen for [route] (FR-023-FR-026). */
 @Composable
 private fun RouteScreen(route: Route) {
     when (route) {
-        Route.ComingSoon, Route.NowPlaying, Route.ShuffleSongs, Route.Clock, Route.About ->
-            ComingSoonScreen()
+        Route.Clock -> ClockScreen()
+        Route.About -> AboutScreen()
+        // Placeholders in this slice: Music items, Stopwatch, Games, Shuffle Songs, Now Playing.
+        Route.ComingSoon, Route.ShuffleSongs, Route.NowPlaying -> ComingSoonScreen()
     }
 }

@@ -28,6 +28,17 @@
     <string name="coming_soon">Coming soon</string>
     <string name="press_menu_to_go_back">Press MENU to go back.</string>
 
+    <!-- About screen (FR-025); the version comes from BuildConfig -->
+    <string name="about_version">Version %1$s</string>
+    <string name="about_author">by Douglas Rodrigues Neto</string>
+
+    <!-- Accessibility labels for the wheel buttons (used from Phase 7, FR-027) -->
+    <string name="a11y_wheel_center">Select button</string>
+    <string name="a11y_wheel_menu">Menu button</string>
+    <string name="a11y_wheel_next">Next button</string>
+    <string name="a11y_wheel_previous">Previous button</string>
+    <string name="a11y_wheel_play_pause">Play/Pause button</string>
+
     <!-- Label printed on the top of the wheel ring -->
     <string name="wheel_menu">MENU</string>
 </resources>
