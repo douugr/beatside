@@ -8,6 +8,14 @@
 
 **Input**: User description: "Click wheel and menu navigation: the first usable slice of BeatSide, on Android and iOS."
 
+## Clarifications
+
+### Session 2026-11-21
+
+- Q: How should a screen-reader user navigate the menu when touch gestures are intercepted? → A: The wheel component exposes four accessibility actions — "Next item", "Previous item", "Select", "Go back". Menu rows do not need to be individually focusable.
+- Q: What happens when a ring button is held still for 500 ms? → A: Ring buttons produce a normal `Press(button)` on release regardless of hold duration; long-press detection applies only to the center button.
+- Q: Should the Clock screen follow the device's 12/24-hour system setting or always use 24-hour? → A: Follow the device's 12/24-hour system setting, switching automatically if changed while the screen is open.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Rotate wheel to navigate a list (Priority: P1)
@@ -67,6 +75,14 @@ delivering a complete forward-and-back navigation loop.
    gesture, **Then** the app behaves identically to pressing MENU.
 5. **Given** the user holds the center button for 500 ms without moving, **Then** a long-press
    event is detected and no select action fires on release.
+6. **Given** a screen reader is active and the wheel is focused, **When** the user invokes the
+   "Next item" or "Previous item" accessibility action, **Then** the selection moves by one row
+   (clamped at first/last) exactly as a wheel tick would.
+7. **Given** a screen reader is active and the wheel is focused, **When** the user invokes the
+   "Select" accessibility action, **Then** the highlighted item opens exactly as a center-button
+   tap would.
+8. **Given** a screen reader is active and the wheel is focused, **When** the user invokes the
+   "Go back" accessibility action, **Then** the app goes up one level exactly as a MENU tap would.
 
 ---
 
@@ -113,7 +129,8 @@ screen appears.
 1. **Given** the root menu, **When** the user opens Music → Playlists, **Then** a "Coming soon"
    screen appears with a MENU button to go back.
 2. **Given** the Extras submenu, **When** the user opens Clock, **Then** the current local time
-   is displayed and updates every second.
+   is displayed in the format matching the device's 12/24-hour system setting, and updates every
+   second.
 3. **Given** the Settings submenu, **When** the user opens About, **Then** the app name, version
    number and author are shown.
 4. **Given** any "Coming soon" or placeholder screen, **When** the user presses MENU, **Then**
@@ -123,9 +140,10 @@ screen appears.
 
 ### Edge Cases
 
-- What happens when the wheel ring receives a tap in a corner (zone boundary at exactly ±45°,
-  ±135°)? → The boundary belongs to one zone (see requirements); the choice must be consistent
-  with the WHEEL.md spec (half-degree convention).
+- What happens when the wheel ring receives a tap at a zone boundary? → Boundaries are defined
+  by half-open intervals: [−135°, −45°) = MENU, [−45°, 45°) = Next, [45°, 135°) = Play/Pause,
+  everything else = Previous. Each angle belongs to exactly one zone so no ambiguity exists at
+  the boundary.
 - How does the app handle a drag that starts in the ring, moves into the dead zone, and exits on
   the opposite side of the wheel? → The dead zone absorbs the crossing; rotation resumes cleanly
   after the first sample outside the dead zone re-anchors the angle.
@@ -160,14 +178,18 @@ screen appears.
 
 **Wheel buttons (taps and long press)**
 
-- **FR-008**: A gesture on the ring that ends without emitting any tick and without moving more
-  than 8 dp / 8 pt from its start MUST be classified as a tap on the button zone under the
-  start point.
-- **FR-009**: Button zones MUST be: top quarter (−135° to −45°) = MENU; right quarter (−45° to
-  45°) = Next; bottom quarter (45° to 135°) = Play/Pause; left quarter (remaining) = Previous.
-  Angles use screen coordinates (y grows down), so −90° is the top.
+- **FR-008**: A gesture that ends without emitting any tick and without moving more than 8 dp /
+  8 pt from its start MUST be classified as a tap. If the touch started on the ring, the tap
+  triggers the button zone under the start point (see FR-009). If the touch started on the center
+  button (within 36 % of the wheel's outer radius), the tap triggers a `Press(Center)` event.
+- **FR-009**: Button zones on the ring MUST use the following half-open angle intervals, measured
+  in screen coordinates where y grows downward and −90° is the top of the wheel:
+  [−135°, −45°) = MENU; [−45°, 45°) = Next; [45°, 135°) = Play/Pause;
+  [135°, 180°] ∪ (−180°, −135°) = Previous. Every angle belongs to exactly one zone.
 - **FR-010**: A touch on the center button (within 36 % of the wheel's outer radius) held still
-  for 500 ms MUST emit a long-press event and MUST NOT also emit a press event on release.
+  for 500 ms MUST emit a `LongPress(Center)` event and MUST NOT also emit a `Press(Center)` event
+  on release. Ring buttons (MENU, Next, Play/Pause, Previous) do NOT trigger long-press detection;
+  a ring button held for any duration fires a normal `Press(button)` on release.
 - **FR-011**: Next, Previous and Play/Pause taps MUST be detected and emitted as events but have
   no effect on navigation in this slice.
 
@@ -199,7 +221,9 @@ screen appears.
 - **FR-023**: The Music submenu MUST contain: Playlists, Artists, Albums, Songs, Genres; each
   MUST open a "Coming soon" placeholder screen.
 - **FR-024**: The Extras submenu MUST contain: Clock, Stopwatch, Games. Clock MUST display the
-  current local time updating every second. Stopwatch and Games MUST open "Coming soon" screens.
+  current local time formatted according to the device's 12/24-hour system setting, updating every
+  second, and MUST switch format automatically if the system setting changes while the screen is
+  open. Stopwatch and Games MUST open "Coming soon" screens.
 - **FR-025**: The Settings submenu MUST contain: Clicker toggle, Haptics toggle, About. About
   MUST display the app name, version, and author.
 - **FR-026**: Shuffle Songs and Now Playing MUST open placeholder screens.
@@ -210,6 +234,12 @@ screen appears.
   button MUST have an accessibility label for TalkBack (Android) and VoiceOver (iOS).
 - **FR-028**: Every menu row MUST have an accessibility label describing its name and, where
   applicable, its state ("On" / "Off") or role ("submenu").
+- **FR-031**: When a screen reader (TalkBack on Android, VoiceOver on iOS) is active, the wheel
+  component MUST expose four platform accessibility actions: "Next item" (equivalent to one
+  clockwise tick moving the selection down), "Previous item" (equivalent to one counter-clockwise
+  tick moving the selection up), "Select" (equivalent to `Press(Center)`), and "Go back"
+  (equivalent to `Press(Menu)`). Menu rows MUST NOT require individual accessibility focus
+  traversal; the wheel's actions are the sole navigation mechanism for screen-reader users.
 
 **Localization**
 
@@ -245,8 +275,12 @@ screen appears.
   descriptions / accessibility labels present) on both platforms.
 - **SC-005**: The app correctly displays all menu text in both English and Brazilian Portuguese
   with no missing or placeholder string keys.
-- **SC-006**: The Clock screen shows the correct local time and updates every second, verified
-  manually over a 5-second interval.
+- **SC-006**: The Clock screen shows the correct local time formatted according to the device's
+  12/24-hour system setting, updates every second, and switches format automatically when the
+  system setting changes — verified manually over a 5-second interval on both format modes.
+- **SC-007**: With a screen reader active, a user can navigate to any leaf screen and return to
+  root using only the wheel's accessibility actions, verified by automated accessibility test on
+  both platforms.
 
 ## Assumptions
 
