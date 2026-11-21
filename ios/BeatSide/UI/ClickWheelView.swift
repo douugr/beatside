@@ -13,7 +13,12 @@ struct ClickWheelView: View {
             WheelTouchSurface(onEvent: onEvent)
         }
         .aspectRatio(1, contentMode: .fit)
+        // One element for UI tests; labels and the adjustable trait come in T046.
+        .accessibilityElement(children: .ignore)
+        .accessibilityIdentifier(Self.accessibilityID)
     }
+
+    static let accessibilityID = "click_wheel"
 }
 
 private enum WheelColors {

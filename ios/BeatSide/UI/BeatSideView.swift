@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Root view: owns the menu state and the session settings, and routes wheel events through
-/// `MenuNavigator`. Phase 3 (US1) routes ticks only; presses are wired in T028.
+/// Root view: owns the menu state and the session settings, and routes every wheel event through
+/// `MenuNavigator`: Center opens, MENU goes back (FR-012, FR-013). iOS has no system back gesture
+/// for this; FR-014 is Android-only.
 struct BeatSideView: View {
     @State private var menuState = MenuState.root(BeatSideMenu.root)
     @State private var settings = WheelSettings()
@@ -22,11 +23,14 @@ struct BeatSideView: View {
     }
 
     private func handle(_ event: WheelEvent) {
-        guard case .tick = event else { return }
         let result = MenuNavigator.reduce(menuState, event)
         menuState = result.state
-        if case .toggleSetting(let key) = result.effect {
+        switch result.effect {
+        case .toggleSetting(let key):
             settings = settings.toggled(key)
+        case .unhandled, nil:
+            // Next / Previous / Play-Pause and long press have no effect in this slice (FR-011).
+            break
         }
     }
 }

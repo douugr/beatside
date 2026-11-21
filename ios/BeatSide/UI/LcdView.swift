@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The display: a title bar with the current node's title, then its content. Submenus show
-/// their rows; leaf screens show a placeholder until RouteView lands in T029.
+/// their rows; leaf screens are drawn by `RouteView`.
 struct LcdView: View {
     let state: MenuState
     let settings: WheelSettings
@@ -33,8 +33,23 @@ struct LcdView: View {
             MenuListView(children: children, selectedIndex: state.current.selectedIndex, settings: settings)
                 // A new list (fresh scroll position) per stack level.
                 .id(state.stack.count)
-        case .screen, .toggle:
+        case .screen(_, let route):
+            RouteView(route: route)
+        case .toggle:
+            // Toggles are never pushed onto the stack (MenuNavigator emits toggleSetting instead).
             Color.clear
+        }
+    }
+}
+
+/// Draws the leaf screen for a route. Every route is a placeholder until Phase 6 (T042).
+private struct RouteView: View {
+    let route: Route
+
+    var body: some View {
+        switch route {
+        case .comingSoon, .nowPlaying, .shuffleSongs, .clock, .about:
+            ComingSoonView()
         }
     }
 }

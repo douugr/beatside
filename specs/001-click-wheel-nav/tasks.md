@@ -123,9 +123,9 @@
 
 ### iOS — US2 (parallel with T026–T027)
 
-- [ ] T028 [P] [US2] Wire `press(.center)` and `press(.menu)` events in `ios/BeatSide/UI/BeatSideView.swift`: center press → `MenuNavigator.reduce`; menu press → `MenuNavigator.back` (FR-012, FR-013); no system back gesture on iOS — FR-014 is Android-only
+- [x] T028 [P] [US2] Wire `press(.center)` and `press(.menu)` events in `ios/BeatSide/UI/BeatSideView.swift`: center press → `MenuNavigator.reduce`; menu press → `MenuNavigator.back` (FR-012, FR-013); no system back gesture on iOS — FR-014 is Android-only
 
-- [ ] T029 [P] [US2] Add `RouteView` switch to `ios/BeatSide/UI/LcdView.swift` routing `MenuNode.Screen` by `Route`; stub all routes with `ComingSoonView.swift` (localized "Coming soon" + "Press MENU to go back." text) — FR-023, FR-026
+- [x] T029 [P] [US2] Add `RouteView` switch to `ios/BeatSide/UI/LcdView.swift` routing `MenuNode.Screen` by `Route`; stub all routes with `ComingSoonView.swift` (localized "Coming soon" + "Press MENU to go back." text) — FR-023, FR-026
 
 **Checkpoint**: Full forward-and-back navigation loop works on both platforms. Navigating into every submenu and back to root leaves state correct. Android back swipe behaves like MENU.
 
