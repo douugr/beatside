@@ -138,3 +138,73 @@ before the entries were added.
 - **What to expect:** the root menu ("BeatSide" title, Music highlighted). Drag a finger around
   the ring: the highlight moves one row per 15°, clockwise down, and stops at the first/last
   row. Taps do nothing yet, and there's no click or haptic until Phase 5.
+
+## Run of 2026-11-21: JDK pin + T026–T029 (Phase 4, US2)
+
+Stopped after T029 as instructed. Phase 5 (T030+) has not been started.
+
+### Tasks done
+
+| Task(s) | Result | Commit |
+|---|---|---|
+| Setup | Gradle daemon pinned to JDK 21 (`android/gradle/gradle-daemon-jvm.properties`); CI `android-test` moved to Temurin 21. Plain `./gradlew :app:testDebugUnitTest` passes 79/79 from a JDK 25 shell. | 8b0a9fa |
+| T026–T027 | Android: every wheel event goes through `MenuNavigator`; `BackHandler(enabled = canGoBack)` sends a MENU press; `RouteScreen` shows `ComingSoonScreen` (`CenteredMessage`) for every route; strings `coming_soon`, `press_menu_to_go_back`. | 1198df5 |
+| T028–T029 | iOS: every wheel event goes through `MenuNavigator`; `RouteView` shows `ComingSoonView` for every route; the same two keys added to the String Catalog. | c9c44de |
+
+Tests written first and seen failing:
+- Android `BeatSideAppTest` (Robolectric, 8 tests): 4 navigation tests failed before the wiring. The other 4 ("does nothing" cases: MENU at root, ring buttons, long press, back at root) passed from the start and stay as regression guards.
+- iOS `NavigationUITests` (XCUITest, 6 tests): 3 navigation tests failed before the wiring, and the 3 "does nothing" guards passed.
+- iOS `MenuStringsTests`: the placeholder keys were added to the test first and failed until the catalog had them.
+
+### Test counts at the Phase 4 checkpoint
+
+| Platform | Suite | Tests | Result |
+|---|---|---|---|
+| Android | `./gradlew :app:testDebugUnitTest` | 87: WheelTracker 42, MenuNavigator 16, WheelSettings 5, ListScroll 7, MenuStrings 3, ClickWheel 6, BeatSideApp 8 | all pass |
+| iOS | `BeatSide` scheme (unit) | 67: WheelTracker 42, MenuNavigator 16, WheelSettings 5, MenuStrings 4 | all pass |
+| iOS | `BeatSideUITests` scheme (XCUITest) | 6: NavigationUITests | all pass (iPhone 16, iOS 18.1 sim) |
+
+### Decisions and deviations to review
+
+1. **`gradle-daemon-jvm.properties` written by hand.** `./gradlew updateDaemonJvm --jvm-version=21`
+   fails with "Toolchain download repositories have not been configured". The task also writes
+   JDK download URLs, which need a toolchain resolver plugin (foojay). I didn't add a plugin; the
+   file has only `toolchainVersion=21`, so Gradle uses a locally installed JDK 21 and errors
+   clearly on a machine without one. To get auto-download instead, add the
+   `org.gradle.toolchains.foojay-resolver-convention` plugin to `settings.gradle.kts` and re-run
+   the task.
+2. **CI `android-test` moved from JDK 17 to 21**, since a daemon pinned to 21 can't run on a
+   runner that only has 17 set up.
+3. **Back at the root leaves the app (Android).** T026 specifies `BackHandler(enabled = canGoBack)`,
+   so at the root the system handles back. FR-014 says back must behave "identically to MENU",
+   and MENU at the root does nothing, so read literally FR-014 would swallow back at the root and
+   trap the user. Acceptance scenario 4 only covers a submenu. I followed T026, and
+   `BeatSideAppTest` pins this behaviour (`system back at the root is left to the system`).
+   If you agree, consider rewording FR-014 to "…while not at the root".
+4. **Test hooks in production code.** Android `ClickWheelTestTag` (`Modifier.testTag`) and iOS
+   `.accessibilityElement(children: .ignore).accessibilityIdentifier("click_wheel")` on the wheel.
+   On iOS this also hides the decorative glyphs and "MENU" text from VoiceOver as separate
+   elements; T046 adds the wheel's real label, adjustable trait and actions on top.
+5. Every route shows the Coming Soon placeholder (per T027/T029), including Clock, About and
+   Now Playing, until Phase 6.
+
+### What to try by hand
+
+On an Android phone/emulator and an iPhone/simulator:
+
+1. **Open and back:** tap the center on Music, and the title becomes "Music" with Playlists to Genres.
+   Tap MENU (top of the ring) to return to the root with **Music still highlighted**.
+2. **Selection is remembered:** rotate to Settings (2 detents), center, then MENU. You should be
+   back at the root with **Settings** highlighted (acceptance scenario 2).
+3. **Leaf screen:** Music, then Playlists, then center. You should see "Coming soon" and
+   "Press MENU to go back." MENU returns to the Music list with Playlists highlighted.
+4. **Deep then shallow:** go Music, then a lower row (e.g. Genres), then center, then MENU twice. Each
+   level should come back with its own highlight, and the list should start at the top when you
+   open a new submenu.
+5. **MENU at the root:** nothing happens.
+6. **Toggle rows:** Settings, then Clicker, then center. The suffix should flip On ↔ Off (the flags
+   only change the label until Phase 5 adds sound and haptics).
+7. **Long press:** hold the center ~1 s, then release. Nothing should open.
+8. **Other ring buttons:** Next / Previous / Play-Pause taps do nothing.
+9. **Android only, system back:** in any submenu or leaf, back gesture = MENU. At the root, back
+   leaves the app (see decision 3).
