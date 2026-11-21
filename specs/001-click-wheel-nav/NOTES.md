@@ -209,3 +209,83 @@ On an Android phone/emulator and an iPhone/simulator:
 8. **Other ring buttons:** Next / Previous / Play-Pause taps do nothing.
 9. **Android only, system back:** in any submenu or leaf, back gesture = MENU. At the root, back
    leaves the app (see decision 3).
+
+## Run of 2026-11-21: spec amendment + T030–T035 (Phase 5, US3)
+
+Stopped after T035 as instructed. Phase 6 (T036+) has not been started.
+
+### Tasks done
+
+| Task(s) | Result | Commit |
+|---|---|---|
+| Spec | FR-014 reworded (back at the root leaves the app), acceptance scenario US2-9 added, FR-018 now says the iOS click follows the Ring/Silent switch. | 2fed8e3 |
+| T030–T031 | Android `FeedbackPlayer` (pure rules) + `SoundPoolClickSound` / `ViewHaptics`; `ClickWheel` plays feedback before dispatching each event, with the latest settings. | 1a19812 |
+| T032–T033 | iOS `FeedbackPlayer` (pure rules, `Wheel/`) + `AudioClickSound` / `GeneratorHaptics` (`UI/FeedbackOutputs.swift`); `WheelTouchView` prepares haptics on touch-down and plays feedback before dispatching. | c69a8bf |
+| T034–T035 | Verification: Settings rows show On/Off, Center flips them without navigating, and (Android, end to end) the new value applies to the very next tick or press. | a695f5b |
+
+Tests written first and seen failing: `FeedbackPlayerTest` (Android, 9), `FeedbackPlayerTests` (iOS, 11),
+the 4 feedback cases in `ClickWheelTest`, and `WheelTouchViewTests` (iOS, 5). All failed until the
+types and parameters existed. The T034/T035 tests verify wiring that already existed since Phases 3–4, so
+only the new `BeatSideApp(feedback:)` parameter made them fail first. The On/Off assertions passed
+as soon as they compiled.
+
+### Test counts at the Phase 5 checkpoint
+
+| Platform | Suite | Tests | Result |
+|---|---|---|---|
+| Android | `./gradlew :app:testDebugUnitTest` | 104: WheelTracker 42, MenuNavigator 16, WheelSettings 5, ListScroll 7, MenuStrings 3, FeedbackPlayer 9, ClickWheel 10, BeatSideApp 12 | all pass |
+| iOS | `BeatSide` scheme (unit) | 83: WheelTracker 42, MenuNavigator 16, WheelSettings 5, MenuStrings 4, FeedbackPlayer 11, WheelTouchView 5 | all pass |
+| iOS | `BeatSideUITests` scheme | 8: NavigationUITests 6, SettingsUITests 2 | all pass |
+
+### How the requirements are met
+
+- **Never pause or duck other apps' music.** Android: `SoundPool` with `USAGE_ASSISTANCE_SONIFICATION`
+  / `CONTENT_TYPE_SONIFICATION` and no audio-focus request. iOS: `AVAudioSession` category
+  `.ambient` (mixes with others, no `.duckOthers`). Because it's `.ambient`, the Ring/Silent switch
+  mutes the click, matching the amended FR-018.
+- **Same-frame haptics on iOS.** Generators are prepared when a touch lands on the wheel (if
+  Haptics is on) and re-prepared after every fire, so they stay warm through a rotation.
+- **FR-021.** Both `FeedbackPlayer`s take the settings as an argument on every event. The wheel
+  reads the latest value (`rememberUpdatedState` on Android, `updateUIView` on iOS). The press
+  that toggles a setting still uses the old value, and the change applies from the next event.
+  This is tested end to end on Android (`turning Haptics off stops the very next press haptic`).
+
+### Decisions and deviations to review
+
+1. **`FeedbackPlayer` is split into pure rules + platform outputs** (`ClickSound`, `HapticOutput`
+   interfaces/protocols). T030/T032 describe one class holding SoundPool/AVAudioPlayer. The split is
+   what lets FR-018/019/021 be unit-tested with fakes, as you asked. On iOS the pure class is in
+   `Wheel/FeedbackPlayer.swift` and the outputs are in `UI/FeedbackOutputs.swift` (T032 named
+   `UI/FeedbackPlayer.swift`).
+2. **Android press haptic uses `CONFIRM` from API 30**, not 33 as T030 says: the constant exists
+   since API 30. Below 30 it's `VIRTUAL_KEY`. Ticks use `SEGMENT_TICK` (34+) / `CLOCK_TICK`.
+3. **iOS click uses a 4-player `AVAudioPlayer` round-robin** (mirrors Android's 4 SoundPool
+   streams) so rapid detents don't cut each other off.
+4. **Injectable feedback for tests.** Android `ClickWheel(feedback =)` and `BeatSideApp(feedback =)`
+   default to `rememberFeedbackPlayer()`. iOS `WheelTouchView(feedback:)` and its touch overrides
+   delegate to `begin(at:)` / `move(to:)` / `end()` / `cancel()` so unit tests can drive it
+   without `UITouch`.
+5. **Long press fires the medium haptic** (T030/T032: "Press/LongPress → medium"). A center hold
+   gives one buzz at 500 ms and none on release.
+6. Android haptics go through `View.performHapticFeedback`, so they follow the system
+   "Touch feedback" setting. If that setting is off, the in-app Haptics toggle has no visible
+   effect.
+
+### What to try by hand (real devices; simulators/emulators have no haptics)
+
+1. **Click + haptic per detent:** rotate slowly. You should get one click and one light tick per
+   15°, including at the first/last row where the highlight no longer moves (US1-2/3).
+2. **Fast rotation:** spin quickly. Clicks should overlap rather than cut off or lag behind the
+   highlight.
+3. **Presses:** center, MENU, Next, Previous, Play/Pause should each give a medium buzz and **no**
+   click. Holding the center gives one buzz at ~0.5 s and nothing on release.
+4. **Clicker toggle:** Settings → Clicker → center (row shows Off) → rotate. You should feel ticks
+   but hear no click. Toggle back On, and the very next detent clicks.
+5. **Haptics toggle:** Settings → Haptics → center (that press still buzzes) → rotate and press.
+   There should be no haptics at all, while clicks continue. Toggle back On.
+6. **Other apps' music:** start music in Spotify/YouTube Music/Apple Music, open BeatSide and
+   rotate. The music must keep playing at full volume, with clicks mixed on top.
+7. **iOS Ring/Silent switch:** flip to Silent. There should be no click and haptics should still
+   fire. Flip back to Ring and clicks should return.
+8. **Settings are session-only (FR-030):** turn Clicker off, kill and relaunch the app. Clicker
+   should be On again.
