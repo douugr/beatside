@@ -10,7 +10,7 @@ struct MenuNavigatorTests {
     let clicker = MenuNode.toggle(titleKey: "menu_clicker", key: .clicker)
     let about = MenuNode.screen(titleKey: "menu_about", route: .about)
     var music: MenuNode { .submenu(titleKey: "menu_music", children: [songs, albums]) }
-    var root: MenuNode { .submenu(titleKey: "beatside", children: [music, clicker, about]) }
+    var root: MenuNode { .submenu(titleKey: "app_name", children: [music, clicker, about]) }
 
     let center = WheelEvent.press(.center)
     let menu = WheelEvent.press(.menu)
@@ -162,7 +162,7 @@ struct MenuNavigatorTests {
 
     @Test func beatSideMenuTreeMatchesTheDataModel() throws {
         let r = BeatSideMenu.root
-        #expect(r.titleKey == "beatside")
+        #expect(r.titleKey == "app_name")
         guard case .submenu(_, let top) = r else { Issue.record("root is not a submenu"); return }
         #expect(top.map(\.titleKey) == ["menu_music", "menu_extras", "menu_settings", "menu_shuffle_songs", "menu_now_playing"])
 

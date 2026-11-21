@@ -20,7 +20,7 @@ class MenuNavigatorTest {
     private val music = MenuNode.Submenu("menu_music", listOf(songs, albums))
     private val clicker = MenuNode.Toggle("menu_clicker", SettingKey.Clicker)
     private val about = MenuNode.Screen("menu_about", Route.About)
-    private val root = MenuNode.Submenu("beatside", listOf(music, clicker, about))
+    private val root = MenuNode.Submenu("app_name", listOf(music, clicker, about))
 
     private val center = WheelEvent.Press(WheelButton.Center)
     private val menu = WheelEvent.Press(WheelButton.Menu)
@@ -173,7 +173,7 @@ class MenuNavigatorTest {
 
     @Test fun `BeatSideMenu tree matches the data model`() {
         val r = BeatSideMenu.root
-        assertEquals("beatside", r.titleKey)
+        assertEquals("app_name", r.titleKey)
         assertEquals(
             listOf("menu_music", "menu_extras", "menu_settings", "menu_shuffle_songs", "menu_now_playing"),
             r.children.map { it.titleKey },

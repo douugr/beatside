@@ -183,7 +183,7 @@ reduce(state: MenuState, event: WheelEvent) → (MenuState, MenuEffect?)
 `titleKey` values are string resource keys defined in `BeatSideMenu` and resolved by the UI layer.
 
 ```
-Root  titleKey="beatside"
+Root  titleKey="app_name"
 ├── Submenu  titleKey="menu_music"
 │   ├── Screen  titleKey="menu_playlists"   → ComingSoon
 │   ├── Screen  titleKey="menu_artists"     → ComingSoon

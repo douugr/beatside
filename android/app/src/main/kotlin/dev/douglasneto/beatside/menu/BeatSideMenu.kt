@@ -3,7 +3,7 @@ package dev.douglasneto.beatside.menu
 /** The static menu tree for this slice (data-model.md BeatSideMenu). Keys only, no display text. */
 object BeatSideMenu {
     val root = MenuNode.Submenu(
-        titleKey = "beatside",
+        titleKey = "app_name",
         children = listOf(
             MenuNode.Submenu(
                 titleKey = "menu_music",

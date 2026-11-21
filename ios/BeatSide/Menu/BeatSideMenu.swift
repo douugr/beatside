@@ -2,7 +2,7 @@
 /// Keys match the Android `BeatSideMenu.kt`.
 enum BeatSideMenu {
     static let root = MenuNode.submenu(
-        titleKey: "beatside",
+        titleKey: "app_name",
         children: [
             .submenu(
                 titleKey: "menu_music",
