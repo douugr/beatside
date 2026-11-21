@@ -145,9 +145,9 @@
 
 ### iOS — US3 (parallel with T030–T031)
 
-- [ ] T032 [P] [US3] Implement `ios/BeatSide/UI/FeedbackPlayer.swift`: `AVAudioSession.sharedInstance().setCategory(.ambient)` + `AVAudioPlayer` loading `click.wav`; `play(event:settings:)` method mirroring Android logic: Tick → play if clickerEnabled, `UISelectionFeedbackGenerator.selectionChanged()` if hapticsEnabled; Press/LongPress → `UIImpactFeedbackGenerator(.medium).impactOccurred()` if hapticsEnabled (FR-018, FR-019, FR-021)
+- [x] T032 [P] [US3] Implement `ios/BeatSide/UI/FeedbackPlayer.swift`: `AVAudioSession.sharedInstance().setCategory(.ambient)` + `AVAudioPlayer` loading `click.wav`; `play(event:settings:)` method mirroring Android logic: Tick → play if clickerEnabled, `UISelectionFeedbackGenerator.selectionChanged()` if hapticsEnabled; Press/LongPress → `UIImpactFeedbackGenerator(.medium).impactOccurred()` if hapticsEnabled (FR-018, FR-019, FR-021)
 
-- [ ] T033 [P] [US3] Wire `FeedbackPlayer` into `ios/BeatSide/UI/ClickWheelView.swift`; pass `WheelSettings` from `BeatSideView` (FR-018, FR-019); satisfies deferred US1 acceptance scenarios 1–3
+- [x] T033 [P] [US3] Wire `FeedbackPlayer` into `ios/BeatSide/UI/ClickWheelView.swift`; pass `WheelSettings` from `BeatSideView` (FR-018, FR-019); satisfies deferred US1 acceptance scenarios 1–3
 
 ### Settings leaf screen (both platforms)
 

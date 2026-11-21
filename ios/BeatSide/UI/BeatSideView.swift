@@ -11,7 +11,7 @@ struct BeatSideView: View {
         VStack(spacing: 28) {
             LcdView(state: menuState, settings: settings)
                 .frame(maxHeight: .infinity)
-            ClickWheelView(onEvent: handle)
+            ClickWheelView(settings: settings, onEvent: handle)
                 .padding(.horizontal, 30)
         }
         .padding(20)

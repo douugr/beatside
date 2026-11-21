@@ -2,15 +2,16 @@ import SwiftUI
 import UIKit
 
 /// The wheel. Draws the ring and buttons, turns touches into `WheelEvent`s through a
-/// `WheelTracker`, and reports them through `onEvent`. It knows nothing about menus or screens
-/// (Constitution II). Feedback is wired in T033.
+/// `WheelTracker`, plays feedback for each one with the current `settings`, then reports it
+/// through `onEvent`. It knows nothing about menus or screens (Constitution II).
 struct ClickWheelView: View {
+    let settings: WheelSettings
     let onEvent: (WheelEvent) -> Void
 
     var body: some View {
         ZStack {
             WheelFace()
-            WheelTouchSurface(onEvent: onEvent)
+            WheelTouchSurface(settings: settings, onEvent: onEvent)
         }
         .aspectRatio(1, contentMode: .fit)
         // One element for UI tests; labels and the adjustable trait come in T046.
@@ -65,28 +66,36 @@ private struct WheelFace: View {
 
 /// Bridges raw UIKit touches (including cancellation) to the tracker.
 private struct WheelTouchSurface: UIViewRepresentable {
+    let settings: WheelSettings
     let onEvent: (WheelEvent) -> Void
 
     func makeUIView(context: Context) -> WheelTouchView {
-        let view = WheelTouchView()
+        let view = WheelTouchView(feedback: FeedbackPlayer(sound: AudioClickSound(), haptics: GeneratorHaptics()))
+        view.settings = settings
         view.onEvent = onEvent
         return view
     }
 
     func updateUIView(_ view: WheelTouchView, context: Context) {
+        view.settings = settings
         view.onEvent = onEvent
     }
 }
 
 final class WheelTouchView: UIView {
     var onEvent: (WheelEvent) -> Void = { _ in }
+    /// Read on every event, so a toggle applies to the very next tick or press (FR-021).
+    var settings = WheelSettings()
 
+    private let feedback: FeedbackPlayer
     private var tracker = WheelTracker()
     private var activeTouch: UITouch?
+    private var gestureActive = false
     private var longPressTask: Task<Void, Never>?
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(feedback: FeedbackPlayer) {
+        self.feedback = feedback
+        super.init(frame: .zero)
         backgroundColor = .clear
         isMultipleTouchEnabled = false
     }
@@ -103,40 +112,72 @@ final class WheelTouchView: UIView {
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard activeTouch == nil, let touch = touches.first else { return }
-        guard tracker.down(at: touch.location(in: self), diameter: Double(bounds.width)) else { return }
-        activeTouch = touch
+        if begin(at: touch.location(in: self)) { activeTouch = touch }
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = activeTouch, touches.contains(touch) else { return }
+        move(to: touch.location(in: self))
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = activeTouch, touches.contains(touch) else { return }
+        activeTouch = nil
+        end()
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = activeTouch, touches.contains(touch) else { return }
+        activeTouch = nil
+        cancel()
+    }
+
+    // Point-based gesture steps. The touch overrides above delegate here; unit tests drive them
+    // directly because UITouch can't be constructed.
+
+    /// Starts a gesture; returns false (and ignores it) when the point is outside the wheel.
+    @discardableResult
+    func begin(at point: CGPoint) -> Bool {
+        guard !gestureActive, tracker.down(at: point, diameter: Double(bounds.width)) else { return false }
+        gestureActive = true
+        feedback.prepare(settings: settings)
         longPressTask = Task { @MainActor [weak self] in
             try? await Task.sleep(for: .milliseconds(WheelTracker.longPressMillis))
             guard !Task.isCancelled, let self else { return }
             // The tracker decides whether this counts (Center only, no slop, no ticks).
             self.dispatch(self.tracker.longPressTimeout())
         }
+        return true
     }
 
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = activeTouch, touches.contains(touch) else { return }
-        dispatch(tracker.move(to: touch.location(in: self)))
+    func move(to point: CGPoint) {
+        guard gestureActive else { return }
+        dispatch(tracker.move(to: point))
     }
 
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = activeTouch, touches.contains(touch) else { return }
-        endGesture()
+    func end() {
+        guard gestureActive else { return }
+        stopGesture()
         dispatch(tracker.up())
     }
 
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = activeTouch, touches.contains(touch) else { return }
-        endGesture()
+    func cancel() {
+        guard gestureActive else { return }
+        stopGesture()
         tracker.cancel()
     }
 
-    private func endGesture() {
+    private func stopGesture() {
+        gestureActive = false
         longPressTask?.cancel()
         longPressTask = nil
-        activeTouch = nil
     }
 
+    /// Feedback first, in the same frame as the touch sample (Constitution II), then the event.
     private func dispatch(_ events: [WheelEvent]) {
-        events.forEach(onEvent)
+        for event in events {
+            feedback.play(event, settings: settings)
+            onEvent(event)
+        }
     }
 }
