@@ -1,6 +1,9 @@
 package dev.douglasneto.beatside.wheel
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
@@ -8,6 +11,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
+import dev.douglasneto.beatside.menu.SettingKey
+import dev.douglasneto.beatside.settings.WheelSettings
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -32,10 +37,37 @@ class ClickWheelTest {
 
     private val events = mutableListOf<WheelEvent>()
 
+    /** Feedback outputs and dispatched events, in the order they happened. */
+    private val log = mutableListOf<String>()
+    private val fakeFeedback = FeedbackPlayer(
+        sound = object : ClickSound { override fun play() { log += "click" } },
+        haptics = object : HapticOutput {
+            override fun tick() { log += "tick-haptic" }
+            override fun press() { log += "press-haptic" }
+        },
+    )
+
+    private var settings by mutableStateOf(WheelSettings())
+
     private fun setWheel() {
         compose.setContent {
-            ClickWheel(onEvent = { events += it }, modifier = Modifier.size(200.dp).testTag("wheel"))
+            ClickWheel(
+                settings = settings,
+                onEvent = { events += it; log += "event:$it" },
+                modifier = Modifier.size(200.dp).testTag("wheel"),
+                feedback = fakeFeedback,
+            )
         }
+    }
+
+    private fun dragDetents(detents: Int) {
+        compose.onNodeWithTag("wheel").performTouchInput {
+            val r = width / 2f
+            down(Offset.onRing(center, r, -90.0))
+            for (deg in 1..(detents * 15 + 5)) moveTo(Offset.onRing(center, r, -90.0 + deg))
+            up()
+        }
+        compose.waitForIdle()
     }
 
     private fun Offset.Companion.onRing(center: Offset, radius: Float, degrees: Double) = Offset(
@@ -103,5 +135,42 @@ class ClickWheelTest {
         }
         compose.waitForIdle()
         assertEquals(listOf(WheelEvent.Press(WheelButton.Next)), events)
+    }
+
+    // Feedback wiring (T031): FeedbackPlayer runs for every event, before the event is dispatched,
+    // with the settings current at that moment.
+
+    @Test fun `each tick clicks and buzzes before it is dispatched`() {
+        setWheel()
+        dragDetents(2)
+        val tick = "event:${WheelEvent.Tick(+1)}"
+        assertEquals(listOf("click", "tick-haptic", tick, "click", "tick-haptic", tick), log)
+    }
+
+    @Test fun `a press buzzes and never clicks`() {
+        setWheel()
+        compose.onNodeWithTag("wheel").performTouchInput { down(center); up() }
+        compose.waitForIdle()
+        assertEquals(listOf("press-haptic", "event:${WheelEvent.Press(WheelButton.Center)}"), log)
+    }
+
+    @Test fun `turning Clicker off applies to the very next tick`() {
+        setWheel()
+        dragDetents(1)
+        assertEquals(1, log.count { it == "click" })
+        settings = settings.toggled(SettingKey.Clicker)
+        compose.waitForIdle()
+        log.clear()
+        dragDetents(1)
+        assertEquals(listOf("tick-haptic", "event:${WheelEvent.Tick(+1)}"), log)
+    }
+
+    @Test fun `turning Haptics off applies to the very next press`() {
+        setWheel()
+        settings = settings.toggled(SettingKey.Haptics)
+        compose.waitForIdle()
+        compose.onNodeWithTag("wheel").performTouchInput { down(center); up() }
+        compose.waitForIdle()
+        assertEquals(listOf("event:${WheelEvent.Press(WheelButton.Center)}"), log)
     }
 }

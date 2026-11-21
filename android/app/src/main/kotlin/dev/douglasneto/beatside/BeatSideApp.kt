@@ -68,6 +68,6 @@ fun BeatSideApp() {
         verticalArrangement = Arrangement.spacedBy(28.dp),
     ) {
         LcdScreen(menuState, settings, Modifier.fillMaxWidth().weight(1f))
-        ClickWheel(onEvent = ::onWheelEvent, modifier = Modifier.fillMaxWidth(0.82f).testTag(ClickWheelTestTag))
+        ClickWheel(settings = settings, onEvent = ::onWheelEvent, modifier = Modifier.fillMaxWidth(0.82f).testTag(ClickWheelTestTag))
     }
 }

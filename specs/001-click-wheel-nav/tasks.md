@@ -139,9 +139,9 @@
 
 ### Android — US3
 
-- [ ] T030 [US3] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/wheel/FeedbackPlayer.kt`: `SoundPool` (USAGE_ASSISTANCE_SONIFICATION, CONTENT_TYPE_SONIFICATION, maxStreams 4) loading `R.raw.click`; `play(event, settings)` method: Tick → play click if `settings.clickerEnabled`, fire `HapticFeedbackConstants.SEGMENT_TICK` (API 34+) or `CLOCK_TICK` (API < 34) if `settings.hapticsEnabled`; Press/LongPress → fire `CONFIRM` (API 33+) or `VIRTUAL_KEY` if `settings.hapticsEnabled`; `DisposableEffect` release (FR-018, FR-019, FR-021)
+- [x] T030 [US3] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/wheel/FeedbackPlayer.kt`: `SoundPool` (USAGE_ASSISTANCE_SONIFICATION, CONTENT_TYPE_SONIFICATION, maxStreams 4) loading `R.raw.click`; `play(event, settings)` method: Tick → play click if `settings.clickerEnabled`, fire `HapticFeedbackConstants.SEGMENT_TICK` (API 34+) or `CLOCK_TICK` (API < 34) if `settings.hapticsEnabled`; Press/LongPress → fire `CONFIRM` (API 33+) or `VIRTUAL_KEY` if `settings.hapticsEnabled`; `DisposableEffect` release (FR-018, FR-019, FR-021)
 
-- [ ] T031 [US3] Wire `FeedbackPlayer` into `android/app/src/main/kotlin/dev/douglasneto/beatside/wheel/ClickWheel.kt`: add `FeedbackPlayer.play(event, wheelSettings)` call in the dispatch function; `WheelSettings` passed as parameter (FR-018, FR-019, FR-021); satisfies deferred US1 acceptance scenarios 1–3
+- [x] T031 [US3] Wire `FeedbackPlayer` into `android/app/src/main/kotlin/dev/douglasneto/beatside/wheel/ClickWheel.kt`: add `FeedbackPlayer.play(event, wheelSettings)` call in the dispatch function; `WheelSettings` passed as parameter (FR-018, FR-019, FR-021); satisfies deferred US1 acceptance scenarios 1–3
 
 ### iOS — US3 (parallel with T030–T031)
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -19,7 +20,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -28,6 +31,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.douglasneto.beatside.R
+import dev.douglasneto.beatside.settings.WheelSettings
 import kotlinx.coroutines.CancellationException
 
 private val RingLight = Color(0xFFF4F4F2)
@@ -39,14 +43,28 @@ private val Glyph = Color(0xFF8C8C88)
 
 /**
  * The wheel. Draws the ring and buttons, turns touches into [WheelEvent]s through a
- * [WheelTracker], and reports them through [onEvent]. It knows nothing about menus or screens
- * (Constitution II). Feedback is wired in T031.
+ * [WheelTracker], plays feedback for each one with the current [settings], then reports it
+ * through [onEvent]. It knows nothing about menus or screens (Constitution II).
+ *
+ * [feedback] defaults to the real click sound and view haptics; tests pass fakes.
  */
 @Composable
-fun ClickWheel(onEvent: (WheelEvent) -> Unit, modifier: Modifier = Modifier) {
+fun ClickWheel(
+    settings: WheelSettings,
+    onEvent: (WheelEvent) -> Unit,
+    modifier: Modifier = Modifier,
+    feedback: FeedbackPlayer = rememberFeedbackPlayer(),
+) {
     val tapSlopPx = with(LocalDensity.current) { WheelTracker.TAP_SLOP_DP.dp.toPx() }
     val tracker = remember(tapSlopPx) { WheelTracker(tapSlopPx) }
-    val dispatch by rememberUpdatedState(onEvent)
+    val currentOnEvent by rememberUpdatedState(onEvent)
+    val currentSettings by rememberUpdatedState(settings)
+    val currentFeedback by rememberUpdatedState(feedback)
+    // Feedback first, in the same frame as the gesture sample (Constitution II), then the event.
+    val dispatch: (WheelEvent) -> Unit = { event ->
+        currentFeedback.play(event, currentSettings)
+        currentOnEvent(event)
+    }
     val menuLabel = stringResource(R.string.wheel_menu)
     val textMeasurer = rememberTextMeasurer()
 
@@ -107,6 +125,16 @@ fun ClickWheel(onEvent: (WheelEvent) -> Unit, modifier: Modifier = Modifier) {
                 )
             },
     )
+}
+
+/** The real feedback: SoundPool click and haptics on the hosting view. Released on dispose. */
+@Composable
+fun rememberFeedbackPlayer(): FeedbackPlayer {
+    val context = LocalContext.current
+    val view = LocalView.current
+    val sound = remember(context) { SoundPoolClickSound(context.applicationContext) }
+    DisposableEffect(sound) { onDispose { sound.release() } }
+    return remember(sound, view) { FeedbackPlayer(sound, ViewHaptics(view)) }
 }
 
 private fun DrawScope.drawWheel() {
