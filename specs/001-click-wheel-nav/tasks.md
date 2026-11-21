@@ -49,9 +49,9 @@
 
 ### iOS WheelTracker (parallel with T006–T007)
 
-- [ ] T008 [P] Write `ios/BeatSideTests/WheelTrackerTests.swift` implementing the same **40** cases from `specs/001-click-wheel-nav/contracts/wheel-behavior.md` as T006 — confirm ALL tests fail
+- [x] T008 [P] Write `ios/BeatSideTests/WheelTrackerTests.swift` implementing the same **40** cases from `specs/001-click-wheel-nav/contracts/wheel-behavior.md` as T006 — confirm ALL tests fail
 
-- [ ] T009 [P] Implement `ios/BeatSide/Wheel/WheelButton.swift` (enum), `WheelEvent.swift` (enum), `WheelTracker.swift` (pure `struct`, no UIKit imports; same contract as Android; apply FR-010 fix: `longPressTimeout` returns `[]` unless `startButton == .center`) — run T008 tests and confirm all pass
+- [x] T009 [P] Implement `ios/BeatSide/Wheel/WheelButton.swift` (enum), `WheelEvent.swift` (enum), `WheelTracker.swift` (pure `struct`, no UIKit imports; same contract as Android; apply FR-010 fix: `longPressTimeout` returns `[]` unless `startButton == .center`) — run T008 tests and confirm all pass
 
 ### Android Menu Core
 
