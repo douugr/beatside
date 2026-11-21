@@ -63,11 +63,11 @@
 
 ### iOS Menu Core (parallel with T010–T012)
 
-- [ ] T013 [P] Write `ios/BeatSideTests/MenuNavigatorTests.swift` covering the same behavioral table as T010 — confirm all fail
+- [x] T013 [P] Write `ios/BeatSideTests/MenuNavigatorTests.swift` covering the same behavioral table as T010 — confirm all fail
 
-- [ ] T014 [P] Implement `ios/BeatSide/Menu/MenuNode.swift` (indirect enum with `titleKey: String` per `data-model.md` MenuNode — NOT `title: String`), `Route.swift`, `SettingKey.swift`, `MenuFrame.swift`, `MenuState.swift`, `MenuEffect.swift`, `BeatSideMenu.swift` (static tree using `titleKey` string constants matching the keys in T011), `MenuNavigator.swift` (pure `struct` reducer) — run T013 tests and confirm all pass
+- [x] T014 [P] Implement `ios/BeatSide/Menu/MenuNode.swift` (indirect enum with `titleKey: String` per `data-model.md` MenuNode — NOT `title: String`), `Route.swift`, `SettingKey.swift`, `MenuFrame.swift`, `MenuState.swift`, `MenuEffect.swift`, `BeatSideMenu.swift` (static tree using `titleKey` string constants matching the keys in T011), `MenuNavigator.swift` (pure `struct` reducer) — run T013 tests and confirm all pass
 
-- [ ] T015 [P] Implement `ios/BeatSide/Settings/WheelSettings.swift` (struct: `clickerEnabled`, `hapticsEnabled`, `toggled(_:)` per `data-model.md` WheelSettings; session-only — FR-030)
+- [x] T015 [P] Implement `ios/BeatSide/Settings/WheelSettings.swift` (struct: `clickerEnabled`, `hapticsEnabled`, `toggled(_:)` per `data-model.md` WheelSettings; session-only — FR-030)
 
 **Checkpoint**: `./gradlew :app:testDebugUnitTest` and `xcodebuild test` both green. All 40 wheel-behavior contract cases pass on both platforms.
 
