@@ -177,13 +177,13 @@
 
 ### iOS — US4 (parallel with T036–T039)
 
-- [ ] T040 [P] [US4] Implement `ios/BeatSide/UI/Screens/ClockView.swift`: `@State` `Date` updated every second by a `Timer.publish`; `Text(date, format: .dateTime.hour().minute().second())` auto-respects locale 12/24-hour preference; observe `NSLocale.currentLocaleDidChangeNotification` via `.onReceive` to force re-render when preference changes while open (FR-024, SC-006)
+- [x] T040 [P] [US4] Implement `ios/BeatSide/UI/Screens/ClockView.swift`: `@State` `Date` updated every second by a `Timer.publish`; `Text(date, format: .dateTime.hour().minute().second())` auto-respects locale 12/24-hour preference; observe `NSLocale.currentLocaleDidChangeNotification` via `.onReceive` to force re-render when preference changes while open (FR-024, SC-006)
 
-- [ ] T041 [P] [US4] Implement `ios/BeatSide/UI/Screens/AboutView.swift` (app name and author from localized strings, version from `Bundle.main.infoDictionary["CFBundleShortVersionString"]`); `NowPlayingView.swift` placeholder; `ComingSoonView.swift` placeholder with localized text (FR-025, FR-026)
+- [x] T041 [P] [US4] Implement `ios/BeatSide/UI/Screens/AboutView.swift` (app name and author from localized strings, version from `Bundle.main.infoDictionary["CFBundleShortVersionString"]`); `NowPlayingView.swift` placeholder; `ComingSoonView.swift` placeholder with localized text (FR-025, FR-026)
 
-- [ ] T042 [P] [US4] Wire all routes in `ios/BeatSide/UI/LcdView.swift` `RouteView` switch (FR-022–FR-026)
+- [x] T042 [P] [US4] Wire all routes in `ios/BeatSide/UI/LcdView.swift` `RouteView` switch (FR-022–FR-026)
 
-- [ ] T043 [P] [US4] Populate `ios/BeatSide/Resources/Localizable.xcstrings` with all English strings using the same key constants as T039 (matching `BeatSideMenu.swift` `titleKey` values from T014); reference `String(localized:)` or `LocalizedStringKey` throughout all views; verify every `String(localized: child.titleKey)` resolves without a missing-key warning (FR-029)
+- [x] T043 [P] [US4] Populate `ios/BeatSide/Resources/Localizable.xcstrings` with all English strings using the same key constants as T039 (matching `BeatSideMenu.swift` `titleKey` values from T014); reference `String(localized:)` or `LocalizedStringKey` throughout all views; verify every `String(localized: child.titleKey)` resolves without a missing-key warning (FR-029)
 
 **Checkpoint**: Every leaf screen renders. Clock updates every second and respects the system 12/24-hour preference. All menu items are drawn from string resources, not literals.
 

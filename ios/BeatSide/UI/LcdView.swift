@@ -42,13 +42,18 @@ struct LcdView: View {
     }
 }
 
-/// Draws the leaf screen for a route. Every route is a placeholder until Phase 6 (T042).
+/// Draws the leaf screen for a route (FR-023-FR-026).
 private struct RouteView: View {
     let route: Route
 
     var body: some View {
         switch route {
-        case .comingSoon, .nowPlaying, .shuffleSongs, .clock, .about:
+        case .clock:
+            ClockView()
+        case .about:
+            AboutView()
+        case .comingSoon, .shuffleSongs, .nowPlaying:
+            // Placeholders in this slice: Music items, Stopwatch, Games, Shuffle Songs, Now Playing.
             ComingSoonView()
         }
     }

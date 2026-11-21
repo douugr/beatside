@@ -242,6 +242,83 @@
           }
         }
       }
+    },
+    "about_version" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        }
+      }
+    },
+    "about_author" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "by Douglas Rodrigues Neto"
+          }
+        }
+      }
+    },
+    "a11y_wheel_center" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select button"
+          }
+        }
+      }
+    },
+    "a11y_wheel_menu" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu button"
+          }
+        }
+      }
+    },
+    "a11y_wheel_next" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next button"
+          }
+        }
+      }
+    },
+    "a11y_wheel_previous" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous button"
+          }
+        }
+      }
+    },
+    "a11y_wheel_play_pause" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play/Pause button"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

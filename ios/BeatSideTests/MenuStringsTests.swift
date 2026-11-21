@@ -34,7 +34,11 @@ struct MenuStringsTests {
     }
 
     @Test func wheelAndRowStringsHaveCatalogEntries() {
-        let missing = ["setting_on", "setting_off", "wheel_menu", "coming_soon", "press_menu_to_go_back"].filter { !hasCatalogEntry($0) }
+        let missing = [
+            "setting_on", "setting_off", "wheel_menu", "coming_soon", "press_menu_to_go_back",
+            "about_version", "about_author",
+            "a11y_wheel_center", "a11y_wheel_menu", "a11y_wheel_next", "a11y_wheel_previous", "a11y_wheel_play_pause",
+        ].filter { !hasCatalogEntry($0) }
         #expect(missing.isEmpty, "UI keys with no Localizable.xcstrings entry: \(missing)")
     }
 
