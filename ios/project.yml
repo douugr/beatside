@@ -1,0 +1,65 @@
+# Xcode project definition. Generate the project with:  xcodegen generate
+name: BeatSide
+options:
+  bundleIdPrefix: dev.douglasneto
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: "" # Set yours in Xcode or here.
+targets:
+  BeatSide:
+    type: application
+    platform: iOS
+    sources:
+      - path: BeatSide
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.douglasneto.BeatSide
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: BeatSide
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleDarkContent
+  BeatSideTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: BeatSideTests
+    dependencies:
+      - target: BeatSide
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+  BeatSideUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: BeatSideUITests
+    dependencies:
+      - target: BeatSide
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  BeatSide:
+    build:
+      targets:
+        BeatSide: all
+        BeatSideTests: [test]
+    test:
+      targets:
+        - BeatSideTests
+  BeatSideUITests:
+    build:
+      targets:
+        BeatSide: all
+        BeatSideUITests: [test]
+    test:
+      targets:
+        - BeatSideUITests
