@@ -201,7 +201,7 @@
 
 - [x] T047 [P] Add `accessibilityLabel` to each menu row in `ios/BeatSide/UI/MenuListView.swift` with localized name, role ("submenu"), and state ("On"/"Off") (FR-028)
 
-- [ ] T048 Add Brazilian Portuguese translations to `android/app/src/main/res/values-pt-rBR/strings.xml` for every key in `values/strings.xml` (menu item titles, screen titles, button labels, accessibility labels, placeholder messages) (FR-029, SC-005)
+- [x] T048 Add Brazilian Portuguese translations to `android/app/src/main/res/values-pt-rBR/strings.xml` for every key in `values/strings.xml` (menu item titles, screen titles, button labels, accessibility labels, placeholder messages) (FR-029, SC-005)
 
 - [ ] T049 [P] Add Brazilian Portuguese translations to `ios/BeatSide/Resources/Localizable.xcstrings` for every key added in T043 (FR-029, SC-005)
 

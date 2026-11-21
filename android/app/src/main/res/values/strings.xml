@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BeatSide</string>
+    <string name="app_name" translatable="false">BeatSide</string>
 
     <!-- Menu tree titles: one per BeatSideMenu titleKey (mapped in ui/MenuStrings.kt) -->
     <string name="menu_music">Music</string>
