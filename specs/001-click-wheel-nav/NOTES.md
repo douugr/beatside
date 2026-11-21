@@ -367,3 +367,204 @@ Tests written first and seen failing:
    MENU returns to the parent with the same row highlighted (US4-4).
 6. **Wheel on leaf screens:** rotating on Clock/About should still click and buzz but not
    change anything; MENU goes back.
+
+## Run of 2026-11-21: T044–T053 (Phase 7, polish)
+
+Feature 001 is implemented on both platforms. T053 (the manual acceptance run) is **left unchecked
+in tasks.md** for you to tick after running the checklist at the end of this file on your phones.
+
+### Tasks done
+
+| Task(s) | Result | Commit |
+|---|---|---|
+| Clock change | 12-hour pattern `hh:mm:ss a` → `h:mm:ss a` on both platforms (supersedes Phase 6 decision 4). | 0091b62 |
+| T044, T045, T050 | Android: wheel custom actions + labelled button zones, row labels, announcements; `MenuAccessibilityTest`, Robolectric `AccessibilityTest` (API 35). | b234ed9 |
+| T046, T047, T051 | iOS: adjustable "Wheel" element + named actions + labelled buttons, row labels, `BeatSideModel` with announcements; unit tests + `AccessibilityUITests` (incl. accessibility audit). | 3d3c6d7 |
+| T048 | Android pt-BR (`values-pt-rBR`), `TranslationsTest`, `PortugueseTest`. | ceb8e64 |
+| T049 | iOS pt-BR in the String Catalog, catalog completeness test, `LocalizationUITests`. | 5642663 |
+| T052 | CI verified (all suites already run; simulator picker checked); README section on CI and required checks. | a50783e |
+| T053 | Not run (no devices). The manual acceptance checklist is at the end of this file. | — |
+
+Tests first: the ClockFormat change (3 failures per platform), `MenuAccessibilityTest(s)`,
+`AccessibilityTest`, `BeatSideModelTests`, `AccessibilityNavigationTests`, `TranslationsTest`,
+`PortugueseTest` and the pt-BR catalog check all failed before their code existed (most as missing
+types; the translation tests on missing values). `AccessibilityUITests` and `LocalizationUITests`
+were written after the code, as end-to-end checks of the running app.
+
+### Test counts at the end of feature 001
+
+| Platform | Suite | Tests | Result |
+|---|---|---|---|
+| Android | `./gradlew :app:testDebugUnitTest` | 141: WheelTracker 42, MenuNavigator 16, WheelSettings 5, ListScroll 7, MenuStrings 3, FeedbackPlayer 9, ClickWheel 10, BeatSideApp 18, ClockFormat 7, MenuAccessibility 11, Accessibility 7, Translations 3, Portuguese 3 | all pass |
+| iOS | `BeatSide` scheme (unit) | 114: WheelTracker 42, MenuNavigator 16, WheelSettings 5, MenuStrings 5, FeedbackPlayer 11, WheelTouchView 5, ClockFormat 8, AboutInfo 3, MenuAccessibility 11, BeatSideModel 2, AccessibilityNavigation 6 | all pass on iOS 18.1 (iPhone 16) and iOS 26.5 (iPhone 17 Pro) |
+| iOS | `BeatSideUITests` scheme | 17: Navigation 6, Settings 2, LeafScreens 4, Accessibility 4, Localization 1 | all pass on both simulators |
+
+### How the requirements are met
+
+- **FR-031 actions through the same path.** Android: `ClickWheel` custom actions call the same
+  `dispatch` as touches (feedback, then `onEvent` → `MenuNavigator`). iOS: the "Wheel" element's
+  increment/decrement (VoiceOver swipe up/down) and its four named actions call
+  `WheelTouchView.dispatch`. Tests check the click/haptic for each action on both platforms.
+- **Announcements.** `MenuAccessibility.announcement` (pure, same rules on both) decides the text:
+  - a new selection → the row label ("Extras, submenu");
+  - a new screen → its title, plus the highlighted row for a submenu ("Extras, Clock", "Clock");
+  - a toggled setting → the row with its new state ("Clicker, Off");
+  - nothing when nothing changed, e.g. a clamped tick or MENU at the root.
+
+  Android announces through `View.announceForAccessibility`, iOS through
+  `UIAccessibility.post(.announcement)`. Both go through an injectable `Announcer`, and the exact
+  texts are asserted.
+- **FR-028 row labels:** "Music, submenu", "Clicker, On" / "Clique, Desligado", "Música, submenu".
+- **SC-005:** `TranslationsTest` (Android) and the catalog test (iOS) fail on any key without a
+  pt-BR value or with different placeholders.
+- **SC-007:** `AccessibilityTest` (Android, Robolectric) and `AccessibilityNavigationTests` (iOS,
+  through the real accessibility elements) walk to all 11 leaves and back to the root using only
+  the four actions.
+
+### Decisions and deviations to review
+
+1. **Announcements fire on any state change, not only after accessibility actions.** That's
+   simpler and gives the same result: both platform APIs do nothing when no screen reader is
+   running, and with one running a physical tick is announced like "Next item".
+2. **Toggling a setting is also announced** ("Clicker, Off"). Strictly it changes neither the
+   selection nor the screen, but without it a screen-reader user gets no confirmation.
+3. **Announcement for a new submenu = screen + highlighted row** ("Music, Playlists"); for a leaf,
+   the title only ("Clock"). The leaf's content (time, "Coming soon") is read by the screen reader
+   when focused.
+4. **Android `announceForAccessibility` is deprecated from API 36** (live regions recommended).
+   I kept it because you asked for an announcement and it still works with TalkBack; the
+   deprecation warning is suppressed in `ViewAnnouncer`. Worth revisiting before targeting 37.
+5. **Android buttons are semantics-only zones** over the drawn wheel (no pointer input, so touches
+   still reach the gesture handler); the same fractions are used for the iOS button elements.
+   TalkBack/VoiceOver users can focus and double-tap them; Next/Previous/Play-Pause do nothing in
+   this slice (FR-011).
+6. **iOS: four named actions *and* the adjustable trait.** T046 asks for adjustable + Select/Go
+   back, while T051 expects four named actions; both are present, so "Next item"/"Previous item"
+   are reachable by swipe up/down and from the actions rotor.
+7. **iOS event handling moved into `BeatSideModel`** (`@Observable`) so announcements can be
+   unit-tested; `BeatSideView` is now layout only.
+8. **iOS rows are single elements** (`.accessibilityElement(children: .ignore)`); Android rows merge
+   their texts and set a content description. On Android I expect TalkBack to read the content
+   description, which you should confirm in the checklist.
+9. **Unit-test language pinned to en/US** in `ios/project.yml`. Your simulator runs in pt-BR, and
+   once pt-BR strings existed, tests asserting English text got Portuguese.
+10. **Translations to confirm** (same on both platforms): Settings → "Configurações", Clicker →
+    "Clique", Haptics → "Vibração", On/Off → "Ligado"/"Desligado", Now Playing → "Tocando agora",
+    Shuffle Songs → "Músicas aleatórias", the wheel → "Roda". Kept in English as BR users know
+    them: "Playlists", "Extras", "MENU" (the button's name). `app_name` is untranslatable on Android.
+11. **The wheel's accessibility name is "Wheel" / "Roda"**, deliberately not "Click Wheel"
+    (Constitution VI).
+
+### FR / SC coverage
+
+Every FR and SC in spec.md is covered. Rows marked *manual* also need the checklist below,
+because they depend on real hardware, system settings or a screen reader.
+
+| Req | Covered by |
+|---|---|
+| FR-001 layout, portrait | `LcdScreen`/`LcdView` + wheel; portrait in manifest / project.yml; screenshot check (Phase 3) · *manual* |
+| FR-002 title bar + content | title bar tested by `AccessibilityTest` (`LcdTitleTestTag`), `NavigationUITests` |
+| FR-003 15° per detent | WheelTracker D-1–D-4 (both) |
+| FR-004 normalization | WheelTracker N-1–N-7, B-1/B-2 (both) |
+| FR-005 accumulator | WheelTracker D-*, J-1 (both) |
+| FR-006 dead zone | WheelTracker DZ-1–DZ-3 (both) |
+| FR-007 center start, no ticks | WheelTracker C-1–C-3 (both) |
+| FR-008 tap classification | WheelTracker C-4, T-*, J-1 (both); `ClickWheelTest`, `WheelTouchViewTests` |
+| FR-009 zone intervals | WheelTracker T-1–T-17 (both) |
+| FR-010 long press, Center only | WheelTracker LP-*, RH-* (both); `ClickWheelTest`, `NavigationUITests` |
+| FR-011 Next/Prev/PlayPause emitted, no effect | MenuNavigator tests (both); `BeatSideAppTest`, `NavigationUITests` |
+| FR-012 Center opens | MenuNavigator, `BeatSideAppTest`, `NavigationUITests` |
+| FR-013 MENU back, nothing at root | same |
+| FR-014 Android back (root leaves) | `BeatSideAppTest` (both cases) |
+| FR-015 clamping | MenuNavigator (both) |
+| FR-016 minimal scroll | `ListScrollTest` (Android); iOS `scrollTo(nil anchor)` · *manual* |
+| FR-017 › / On / Off | `SettingsUITests`, `BeatSideAppTest` |
+| FR-018 click + light haptic per tick (iOS silent switch) | `FeedbackPlayerTest(s)`, `ClickWheelTest`, `WheelTouchViewTests` · *manual* (sound, haptics, silent switch) |
+| FR-019 medium haptic per press, no click | same |
+| FR-020 Settings toggles | `BeatSideAppTest`, `SettingsUITests` |
+| FR-021 next-event effect | `FeedbackPlayerTest(s)`, `ClickWheelTest`, `WheelTouchViewTests`, `BeatSideAppTest` |
+| FR-022–FR-023 menu tree, Coming soon | MenuNavigator tree test (both), `LeafScreensUITests`, `BeatSideAppTest` |
+| FR-024 Clock | `ClockFormatTest(s)`; Android 12↔24 switch while open (`BeatSideAppTest`); iOS · *manual* |
+| FR-025 About | `BeatSideAppTest`, `AboutInfoTests`, `LeafScreensUITests` |
+| FR-026 placeholders | `BeatSideAppTest`, `LeafScreensUITests` |
+| FR-027 button labels | `AccessibilityTest`, `AccessibilityNavigationTests`, `AccessibilityUITests` |
+| FR-028 row labels | `MenuAccessibilityTest(s)`, `AccessibilityTest`, `AccessibilityUITests`, `PortugueseTest`, `LocalizationUITests` |
+| FR-029 externalized en + pt-BR | `MenuStringsTest(s)`, `TranslationsTest`, catalog pt-BR test, `PortugueseTest`, `LocalizationUITests` |
+| FR-030 session-only settings | no persistence code exists · *manual* (relaunch) |
+| FR-031 four actions | `AccessibilityTest`, `AccessibilityNavigationTests` · *manual* (TalkBack/VoiceOver) |
+| SC-001 any leaf ≤ 10 inputs | tree depth: the longest path from launch is 6 inputs (e.g. Music → Genres: center, 4 detents, center) · *manual* |
+| SC-002 no tick bursts | WheelTracker B-1/B-2, D-* (both) |
+| SC-003 setting applies next interaction | FR-021 tests · *manual* |
+| SC-004 accessibility inspection | `AccessibilityTest` (labels present), `AccessibilityUITests` (`performAccessibilityAudit`) |
+| SC-005 pt-BR complete | `TranslationsTest`, catalog pt-BR test · *manual* (read every screen) |
+| SC-006 Clock 5 s / both formats | `ClockFormatTest(s)`, Android switch test · *manual* |
+| SC-007 screen-reader full tree | `AccessibilityTest` / `AccessibilityNavigationTests` walk every leaf · *manual* |
+
+## Manual acceptance checklist (T053)
+
+Run on a physical Android phone and a physical iPhone. Tick each box per platform. When all
+pass, check off T053 in tasks.md.
+
+### Setup
+- [ ] Android: install from Android Studio (`app`, debug). iOS: run the `BeatSide` scheme on the device.
+- [ ] Device language English, 12-hour time, Touch feedback (Android) on, Ring mode (iOS).
+
+### Layout and wheel (FR-001–FR-011, SC-002)
+- [ ] App is portrait only; the LCD (title bar + list) sits above the wheel.
+- [ ] Rotate slowly clockwise: one row down per ~15°, one click and one light tick per detent.
+- [ ] Rotate counter-clockwise: one row up per detent. At first/last row the highlight stops but click + tick still fire.
+- [ ] Spin several full turns, crossing the left side of the wheel repeatedly: no bursts or skipped rows (SC-002).
+- [ ] Drag through the center and out the other side: no ticks while in the middle; rotation resumes cleanly.
+- [ ] Start a drag on the center button and move onto the ring: no ticks.
+- [ ] Tap MENU, Next, Previous, Play/Pause, center: each gives a medium buzz, no click.
+- [ ] Hold the center ~1 s: one buzz at ~0.5 s, nothing opens on release.
+- [ ] Hold a ring button ~1 s, then release: it acts as a normal tap on release.
+
+### Navigation (FR-012–FR-017, SC-001)
+- [ ] Center opens the highlighted row; MENU goes back with the same row highlighted.
+- [ ] MENU at the root does nothing.
+- [ ] Android only: back gesture = MENU in submenus/leaves; at the root it leaves the app.
+- [ ] Open a long list (Music) on the smallest phone you have: the highlighted row is always fully visible, and the list scrolls only as much as needed.
+- [ ] Submenu/screen rows show "›"; Clicker/Haptics show On/Off.
+- [ ] SC-001: reach Genres, Clock, About, Now Playing; each takes ≤ 10 inputs from launch.
+
+### Feedback and settings (FR-018–FR-021, FR-030, SC-003)
+- [ ] Settings → Clicker → Off: the very next detent is silent but still buzzes. On again: clicks return.
+- [ ] Settings → Haptics → Off: the very next detent/press has no buzz; clicks continue. On again.
+- [ ] Music playing in another app keeps playing at full volume while you rotate.
+- [ ] iOS: Silent switch on → no click, haptics still fire.
+- [ ] Turn Clicker off, kill and relaunch: Clicker is On again (FR-030).
+
+### Leaf screens (FR-022–FR-026, SC-006)
+- [ ] Every Music item, Stopwatch, Games, Shuffle Songs, Now Playing → "Coming soon" + "Press MENU to go back."
+- [ ] About → "BeatSide", "Version 0.1.0", "by Douglas Rodrigues Neto".
+- [ ] Clock: correct local time, seconds advance once per second; watch for 5 s (SC-006).
+- [ ] With Clock open, switch the system to 24-hour: the display changes to `19:05:09` style without leaving the screen. Switch back: `7:05:09 PM` style (no leading zero).
+- [ ] With Clock open, change the time zone: the hour updates.
+
+### Brazilian Portuguese (FR-029, SC-005)
+- [ ] Set the device to Português (Brasil). Visit every screen: no English left and no raw keys (e.g. `menu_music`).
+- [ ] Check that the wording reads naturally (see decision 10 above).
+- [ ] About shows "Versão 0.1.0" and "por Douglas Rodrigues Neto"; placeholders say "Em breve" / "Pressione MENU para voltar."
+
+### TalkBack (Android) (FR-027, FR-028, FR-031, SC-004, SC-007)
+- [ ] Turn on TalkBack. Focus the wheel: it is read as "Wheel".
+- [ ] Open the actions menu (three-finger tap or swipe up-then-right): "Next item", "Previous item", "Select", "Go back".
+- [ ] "Next item" moves the selection, clicks and buzzes, and TalkBack announces the new row (e.g. "Extras, submenu").
+- [ ] "Select" opens it and announces "Extras, Clock"; "Select" again announces "Clock"; "Go back" returns.
+- [ ] Toggle Clicker with "Select": announced "Clicker, Off".
+- [ ] Explore by touch over the wheel: "Select button", "Menu button", "Next button", "Previous button", "Play/Pause button".
+- [ ] Focus a row: it reads once as "Music, submenu" / "Clicker, On" (not the name twice; see decision 8).
+- [ ] SC-007: reach every leaf and return to the root using only the wheel's actions.
+- [ ] Repeat the announcements check in Português (Brasil): e.g. "Música, submenu", "Clique, Desligado".
+
+### VoiceOver (iOS) (FR-027, FR-028, FR-031, SC-004, SC-007)
+- [ ] Turn on VoiceOver. Focus the wheel: "Wheel, adjustable".
+- [ ] Swipe up/down: next/previous item with click + haptic, and the new row is announced.
+- [ ] Actions rotor (swipe up/down after selecting "Actions"): "Next item", "Previous item", "Select", "Go back".
+- [ ] "Select" opens and announces; "Go back" returns and announces the parent and its row.
+- [ ] Toggle Clicker with "Select": announced "Clicker, Off".
+- [ ] Swipe right through the wheel's buttons: "Select button", "Menu button", "Next button", "Play/Pause button", "Previous button"; double-tap presses.
+- [ ] Rows read as "Music, submenu" / "Clicker, On".
+- [ ] SC-007: reach every leaf and return to the root using only the wheel.
+- [ ] Repeat in Português (Brasil): "Roda", "Próximo item", "Música, submenu".
