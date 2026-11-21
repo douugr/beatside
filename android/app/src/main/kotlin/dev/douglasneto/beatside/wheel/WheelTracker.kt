@@ -1,0 +1,150 @@
+package dev.douglasneto.beatside.wheel
+
+import kotlin.math.atan2
+import kotlin.math.hypot
+
+/** The five physical buttons of the wheel. See docs/WHEEL.md. */
+enum class WheelButton { Center, Menu, Next, Previous, PlayPause }
+
+/** What the wheel reports to screens. Screens never see raw touches. */
+sealed interface WheelEvent {
+    /** One detent. `+1` is clockwise (down a list), `-1` counter-clockwise. */
+    data class Tick(val direction: Int) : WheelEvent
+    data class Press(val button: WheelButton) : WheelEvent
+    data class LongPress(val button: WheelButton) : WheelEvent
+}
+
+enum class WheelSensitivity(val degreesPerTick: Float) {
+    Low(20f),
+    Normal(15f),
+    High(10f),
+}
+
+/**
+ * Turns touch samples into [WheelEvent]s, following docs/WHEEL.md.
+ *
+ * Pure logic with no Android imports, so it runs in plain JVM unit tests.
+ * Coordinates are relative to the wheel's top-left corner, in pixels, with y growing down.
+ *
+ * Call order for one gesture: [down], then any number of [move], optionally
+ * [longPressTimeout] (after [LONG_PRESS_MILLIS] if the finger is still down), then [up].
+ */
+class WheelTracker(
+    var sensitivity: WheelSensitivity = WheelSensitivity.Normal,
+    private val tapSlopPx: Float,
+) {
+    private var active = false
+    private var radius = 0f
+    private var startX = 0f
+    private var startY = 0f
+    private var startButton = WheelButton.Center
+    private var startedInCenter = false
+    private var lastAngle: Float? = null
+    private var accumulator = 0f
+    private var emittedTick = false
+    private var movedBeyondSlop = false
+    private var longPressFired = false
+
+    /**
+     * Starts a gesture. [diameter] is the wheel's size in pixels.
+     * Returns false (and ignores the gesture) when the touch is outside the wheel.
+     */
+    fun down(x: Float, y: Float, diameter: Float): Boolean {
+        radius = diameter / 2f
+        val button = buttonAt(x - radius, y - radius, radius) ?: return false
+        active = true
+        startX = x
+        startY = y
+        startButton = button
+        startedInCenter = button == WheelButton.Center
+        lastAngle = if (startedInCenter) null else angleOf(x - radius, y - radius)
+        accumulator = 0f
+        emittedTick = false
+        movedBeyondSlop = false
+        longPressFired = false
+        return true
+    }
+
+    fun move(x: Float, y: Float): List<WheelEvent> {
+        if (!active) return emptyList()
+        if (hypot(x - startX, y - startY) > tapSlopPx) movedBeyondSlop = true
+        if (startedInCenter || longPressFired) return emptyList()
+
+        val dx = x - radius
+        val dy = y - radius
+        if (hypot(dx, dy) < DEAD_ZONE_RATIO * radius) {
+            // The angle is unstable near the center: drop the anchor and wait.
+            lastAngle = null
+            return emptyList()
+        }
+
+        val angle = angleOf(dx, dy)
+        val previous = lastAngle
+        lastAngle = angle
+        if (previous == null) return emptyList() // Re-anchor after the dead zone.
+
+        accumulator += normalize(angle - previous)
+        val step = sensitivity.degreesPerTick
+        val events = mutableListOf<WheelEvent>()
+        while (accumulator >= step) {
+            events += WheelEvent.Tick(+1)
+            accumulator -= step
+        }
+        while (accumulator <= -step) {
+            events += WheelEvent.Tick(-1)
+            accumulator += step
+        }
+        if (events.isNotEmpty()) emittedTick = true
+        return events
+    }
+
+    /** Call once, [LONG_PRESS_MILLIS] after [down], if the gesture is still active. */
+    fun longPressTimeout(): List<WheelEvent> {
+        if (!active || longPressFired || emittedTick || movedBeyondSlop) return emptyList()
+        longPressFired = true
+        return listOf(WheelEvent.LongPress(startButton))
+    }
+
+    fun up(): List<WheelEvent> {
+        if (!active) return emptyList()
+        active = false
+        if (longPressFired || emittedTick || movedBeyondSlop) return emptyList()
+        return listOf(WheelEvent.Press(startButton))
+    }
+
+    fun cancel() {
+        active = false
+    }
+
+    companion object {
+        const val CENTER_RATIO = 0.36f
+        const val DEAD_ZONE_RATIO = 0.20f
+        const val LONG_PRESS_MILLIS = 500L
+
+        /** Maps any angle to (-180°, 180°]. */
+        fun normalize(degrees: Float): Float {
+            var d = degrees % 360f
+            if (d > 180f) d -= 360f
+            if (d <= -180f) d += 360f
+            return d
+        }
+
+        /** Angle in degrees, screen coordinates: -90° is up, larger is clockwise. */
+        fun angleOf(dx: Float, dy: Float): Float =
+            Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+
+        /** Which button sits at an offset from the wheel's center, or null outside the wheel. */
+        fun buttonAt(dx: Float, dy: Float, radius: Float): WheelButton? {
+            val distance = hypot(dx, dy)
+            if (distance > radius) return null
+            if (distance < CENTER_RATIO * radius) return WheelButton.Center
+            val angle = angleOf(dx, dy)
+            return when {
+                angle >= -135f && angle < -45f -> WheelButton.Menu
+                angle >= -45f && angle < 45f -> WheelButton.Next
+                angle >= 45f && angle < 135f -> WheelButton.PlayPause
+                else -> WheelButton.Previous
+            }
+        }
+    }
+}
