@@ -175,7 +175,8 @@ Tests written first and seen failing:
    the task.
 2. **CI `android-test` moved from JDK 17 to 21**, since a daemon pinned to 21 can't run on a
    runner that only has 17 set up.
-3. **Back at the root leaves the app (Android).** T026 specifies `BackHandler(enabled = canGoBack)`,
+3. ~~**Back at the root leaves the app (Android).**~~ Resolved: FR-014 reworded and acceptance
+   scenario US2-9 added (spec amendment, 2026-11-21). Original note: T026 specifies `BackHandler(enabled = canGoBack)`,
    so at the root the system handles back. FR-014 says back must behave "identically to MENU",
    and MENU at the root does nothing, so read literally FR-014 would swallow back at the root and
    trap the user. Acceptance scenario 4 only covers a submenu. I followed T026, and

@@ -55,7 +55,8 @@ root menu without pressing any button — delivers demonstrable, feel-based valu
 
 Having highlighted an item with the wheel, the user presses the center button to open it. They
 navigate into a submenu, then press the MENU button (top of the ring) to return one level. At the
-root, pressing MENU does nothing. The system back gesture mirrors MENU on Android.
+root, pressing MENU does nothing. The system back gesture mirrors MENU on Android, except at the
+root, where it leaves the app.
 
 **Why this priority**: Navigation is the second pillar of the interaction model. Without open and
 back, the user is trapped on the first screen.
@@ -83,6 +84,9 @@ delivering a complete forward-and-back navigation loop.
    tap would.
 8. **Given** a screen reader is active and the wheel is focused, **When** the user invokes the
    "Go back" accessibility action, **Then** the app goes up one level exactly as a MENU tap would.
+9. **Given** an Android device showing the root menu, **When** the user triggers the system back
+   gesture, **Then** the app leaves the root and the system handles back (the app is closed or
+   sent to the background), unlike MENU, which does nothing at the root.
 
 ---
 
@@ -198,7 +202,8 @@ screen appears.
 - **FR-012**: The center button tap (select) MUST open the highlighted menu item.
 - **FR-013**: The MENU button tap MUST navigate one level up in the menu tree; at the root it
   MUST do nothing.
-- **FR-014**: On Android, the system back gesture MUST behave identically to the MENU button.
+- **FR-014**: On Android, the system back gesture MUST behave identically to the MENU button
+  while not at the root; at the root it leaves the app.
 - **FR-015**: The list selection MUST clamp at the first and last rows (no wrap-around).
 - **FR-016**: The content region MUST scroll the minimum amount necessary to keep the highlighted
   row fully visible after every tick.
@@ -209,6 +214,8 @@ screen appears.
 
 - **FR-018**: Every tick MUST play a short click sound AND fire a light haptic, unless the user
   has disabled them individually.
+  On iOS the click sound follows the Ring/Silent switch (silent mode mutes the click; haptics
+  still fire).
 - **FR-019**: Every button press MUST fire a medium haptic and MUST NOT play a click sound.
 - **FR-020**: The Settings screen MUST provide Clicker (on/off) and Haptics (on/off) toggles.
 - **FR-021**: Toggling Clicker or Haptics MUST take effect on the very next tick or button press
