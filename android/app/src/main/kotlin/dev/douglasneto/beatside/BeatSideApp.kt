@@ -26,8 +26,10 @@ import dev.douglasneto.beatside.menu.MenuState
 import dev.douglasneto.beatside.settings.WheelSettings
 import dev.douglasneto.beatside.ui.LcdScreen
 import dev.douglasneto.beatside.wheel.ClickWheel
+import dev.douglasneto.beatside.wheel.FeedbackPlayer
 import dev.douglasneto.beatside.wheel.WheelButton
 import dev.douglasneto.beatside.wheel.WheelEvent
+import dev.douglasneto.beatside.wheel.rememberFeedbackPlayer
 
 /** Test tag of the wheel, used by UI tests to send touches. */
 const val ClickWheelTestTag = "click_wheel"
@@ -38,9 +40,11 @@ private val Body = Brush.verticalGradient(listOf(Color(0xFFFAFAF8), Color(0xFFE3
  * Root composable: owns the menu state and the session settings, and routes every wheel event
  * through [MenuNavigator]. The system back gesture is a MENU press while there is a level to go
  * back to (FR-014); at the root it is left to the system.
+ *
+ * [feedback] defaults to the real click sound and haptics; tests pass fakes.
  */
 @Composable
-fun BeatSideApp() {
+fun BeatSideApp(feedback: FeedbackPlayer = rememberFeedbackPlayer()) {
     var menuState by remember { mutableStateOf(MenuState.root(BeatSideMenu.root)) }
     var settings by remember { mutableStateOf(WheelSettings()) }
 
@@ -68,6 +72,11 @@ fun BeatSideApp() {
         verticalArrangement = Arrangement.spacedBy(28.dp),
     ) {
         LcdScreen(menuState, settings, Modifier.fillMaxWidth().weight(1f))
-        ClickWheel(settings = settings, onEvent = ::onWheelEvent, modifier = Modifier.fillMaxWidth(0.82f).testTag(ClickWheelTestTag))
+        ClickWheel(
+            settings = settings,
+            onEvent = ::onWheelEvent,
+            modifier = Modifier.fillMaxWidth(0.82f).testTag(ClickWheelTestTag),
+            feedback = feedback,
+        )
     }
 }

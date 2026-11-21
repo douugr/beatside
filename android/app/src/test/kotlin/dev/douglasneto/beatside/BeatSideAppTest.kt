@@ -5,8 +5,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
+import dev.douglasneto.beatside.wheel.ClickSound
+import dev.douglasneto.beatside.wheel.FeedbackPlayer
+import dev.douglasneto.beatside.wheel.HapticOutput
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -28,8 +33,18 @@ class BeatSideAppTest {
 
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
 
+    /** Feedback outputs, recorded by fakes so the Settings → feedback chain is observable. */
+    private val feedbackLog = mutableListOf<String>()
+    private val fakeFeedback = FeedbackPlayer(
+        sound = object : ClickSound { override fun play() { feedbackLog += "click" } },
+        haptics = object : HapticOutput {
+            override fun tick() { feedbackLog += "tick-haptic" }
+            override fun press() { feedbackLog += "press-haptic" }
+        },
+    )
+
     @Before fun setUp() {
-        compose.setContent { BeatSideApp() }
+        compose.setContent { BeatSideApp(feedback = fakeFeedback) }
     }
 
     private fun TouchInjectionScope.ring(degrees: Double) = Offset(
@@ -123,5 +138,55 @@ class BeatSideAppTest {
         tapRing(90.0)
         shows("Music")
         hides("Playlists")
+    }
+
+    // US3 Settings (T034): toggle rows show On/Off, flip on Center, and the new value applies to
+    // the very next tick or press (FR-020, FR-021).
+
+    private fun count(text: String) = compose.onAllNodesWithText(text).fetchSemanticsNodes().size
+
+    private fun openSettings() {
+        rotate(2)
+        tapCenter()
+        shows("Clicker")
+    }
+
+    @Test fun `Settings shows Clicker and Haptics On by default`() {
+        openSettings()
+        assertEquals(2, count("On"))
+        assertEquals(0, count("Off"))
+    }
+
+    @Test fun `Center on a toggle flips its row between On and Off`() {
+        openSettings()
+        tapCenter() // Clicker
+        assertEquals(1, count("On"))
+        assertEquals(1, count("Off"))
+        tapCenter()
+        assertEquals(2, count("On"))
+        shows("Clicker") // still in Settings: toggles never navigate
+    }
+
+    @Test fun `turning Clicker off silences the very next tick`() {
+        openSettings()
+        tapCenter() // Clicker -> Off
+        feedbackLog.clear()
+        rotate(1)
+        assertEquals(listOf("tick-haptic"), feedbackLog)
+    }
+
+    @Test fun `turning Haptics off stops the very next press haptic`() {
+        openSettings()
+        rotate(1) // Haptics
+        feedbackLog.clear()
+        tapCenter() // Haptics -> Off; this press still uses the old setting
+        assertEquals(listOf("press-haptic"), feedbackLog)
+        assertEquals(1, count("Off"))
+        feedbackLog.clear()
+        tapCenter() // Haptics -> On; Haptics was off for this press
+        assertEquals(emptyList<String>(), feedbackLog)
+        feedbackLog.clear()
+        rotate(1) // About: click and haptic again
+        assertEquals(listOf("click", "tick-haptic"), feedbackLog)
     }
 }

@@ -151,9 +151,9 @@
 
 ### Settings leaf screen (both platforms)
 
-- [ ] T034 [US3] Verify Settings leaf screen flow on Android: `LcdScreen.kt` already renders `MenuNode.Toggle` rows via `MenuListContent` with "On"/"Off" suffix; confirm `ToggleSetting` effect → `WheelSettings.toggled()` state update → immediate re-render of suffix (FR-020, FR-021); no separate file needed beyond the existing wiring confirmed in T026
+- [x] T034 [US3] Verify Settings leaf screen flow on Android: `LcdScreen.kt` already renders `MenuNode.Toggle` rows via `MenuListContent` with "On"/"Off" suffix; confirm `ToggleSetting` effect → `WheelSettings.toggled()` state update → immediate re-render of suffix (FR-020, FR-021); no separate file needed beyond the existing wiring confirmed in T026
 
-- [ ] T035 [P] [US3] Same verification on iOS in `BeatSideView.swift` / `MenuListView.swift` — confirm Toggle rows show "On"/"Off" and toggling via center button updates `WheelSettings` and re-renders suffix immediately (FR-020, FR-021)
+- [x] T035 [P] [US3] Same verification on iOS in `BeatSideView.swift` / `MenuListView.swift` — confirm Toggle rows show "On"/"Off" and toggling via center button updates `WheelSettings` and re-renders suffix immediately (FR-020, FR-021)
 
 **Checkpoint**: Click and haptic fire on every detent. Toggling Settings in-app silences click or haptic on the very next rotation. US1 acceptance scenarios 1–3 are now fully satisfied.
 
