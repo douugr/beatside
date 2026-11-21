@@ -114,7 +114,9 @@ before the entries were added.
   Android suite now: `JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-22.jdk/Contents/Home ./gradlew :app:testDebugUnitTest`.
   CI (JDK 17) is unaffected. Options: pin a Gradle daemon/toolchain JVM (17 or 21), or move to
   a Robolectric release that supports JDK 25. T050 depends on this too.
-- **Rotation not tried by hand on either platform.** Android has no AVD here; on iOS I launched
+- ~~**Rotation not tried by hand on either platform.**~~ Resolved 2026-11-21: Douglas tested the
+  wheel by hand on a physical iPhone and a physical Android phone; rotation, boundary crossing,
+  jitter, center crossing and clamping all behaved as specified on both. Original note: Android has no AVD here; on iOS I launched
   the app and checked the layout by screenshot (root list, highlight, wheel), but couldn't inject
   drags into the simulator. Android rotation is covered by `ClickWheelTest`; the iOS touch
   surface has no automated test yet.
