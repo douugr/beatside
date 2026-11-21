@@ -13,7 +13,7 @@ final class SettingsUITests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
-        wheel = app.otherElements["click_wheel"]
+        wheel = app.wheel
         XCTAssertTrue(wheel.waitForExistence(timeout: 5), "wheel not found")
     }
 
@@ -29,12 +29,12 @@ final class SettingsUITests: XCTestCase {
         ring(180).press(forDuration: 0.05, thenDragTo: ring(180 + Double(detents * 15 + 5)))
     }
 
-    private func count(_ text: String) -> Int { app.staticTexts.matching(identifier: text).count }
+    private func count(_ state: String) -> Int { app.rowCount(withState: state) }
 
     private func openSettings() {
         rotate(detents: 2)
         tapCenter()
-        XCTAssertTrue(app.staticTexts["Clicker"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.labelled("Clicker").waitForExistence(timeout: 2))
     }
 
     func testSettingsShowsClickerAndHapticsOnByDefault() {
@@ -46,7 +46,7 @@ final class SettingsUITests: XCTestCase {
     func testCenterOnAToggleFlipsItsRowBetweenOnAndOff() {
         openSettings()
         tapCenter() // Clicker
-        XCTAssertTrue(app.staticTexts["Off"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.labelled("Clicker, Off").waitForExistence(timeout: 2))
         XCTAssertEqual(count("On"), 1)
         XCTAssertEqual(count("Off"), 1)
 
@@ -56,6 +56,6 @@ final class SettingsUITests: XCTestCase {
 
         tapCenter() // Haptics back On
         XCTAssertEqual(count("On"), 1)
-        XCTAssertTrue(app.staticTexts["Clicker"].exists, "toggles never navigate")
+        XCTAssertTrue(app.labelled("Clicker").exists, "toggles never navigate")
     }
 }

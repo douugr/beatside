@@ -57,5 +57,8 @@ private struct MenuRow: View {
         .frame(height: rowHeight)
         .frame(maxWidth: .infinity)
         .background { if selected { LcdColors.selection } }
+        // FR-028: one screen-reader element with the name plus the role or state.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(MenuAccessibility.rowLabel(child, settings: settings, strings: CatalogAccessibilityStrings()))
     }
 }

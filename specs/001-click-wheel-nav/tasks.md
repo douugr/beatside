@@ -197,9 +197,9 @@
 
 - [x] T045 [P] Implement accessibility labels on Android ring buttons: `contentDescription` for each zone in `ClickWheel.kt` semantics (localized "Menu button", "Next button", "Play/Pause button", "Previous button"); add `contentDescription` to each menu row in `MenuListContent.kt` including role ("submenu") and state ("On"/"Off") suffixes (FR-027, FR-028)
 
-- [ ] T046 [P] Implement accessibility on iOS `ClickWheelView.swift`: set `isAccessibilityElement = true`, `accessibilityTraits = [.adjustable]`; override `accessibilityIncrement()` → Tick(+1), `accessibilityDecrement()` → Tick(-1); add `UIAccessibilityCustomAction` for "Select" and "Go back"; post `UIAccessibility.post(notification: .announcement, argument: String(localized: newNode.titleKey))` after any navigation action (FR-027, FR-031)
+- [x] T046 [P] Implement accessibility on iOS `ClickWheelView.swift`: set `isAccessibilityElement = true`, `accessibilityTraits = [.adjustable]`; override `accessibilityIncrement()` → Tick(+1), `accessibilityDecrement()` → Tick(-1); add `UIAccessibilityCustomAction` for "Select" and "Go back"; post `UIAccessibility.post(notification: .announcement, argument: String(localized: newNode.titleKey))` after any navigation action (FR-027, FR-031)
 
-- [ ] T047 [P] Add `accessibilityLabel` to each menu row in `ios/BeatSide/UI/MenuListView.swift` with localized name, role ("submenu"), and state ("On"/"Off") (FR-028)
+- [x] T047 [P] Add `accessibilityLabel` to each menu row in `ios/BeatSide/UI/MenuListView.swift` with localized name, role ("submenu"), and state ("On"/"Off") (FR-028)
 
 - [ ] T048 Add Brazilian Portuguese translations to `android/app/src/main/res/values-pt-rBR/strings.xml` for every key in `values/strings.xml` (menu item titles, screen titles, button labels, accessibility labels, placeholder messages) (FR-029, SC-005)
 
@@ -207,7 +207,7 @@
 
 - [x] T050 [P] Write Compose accessibility test `android/app/src/test/kotlin/dev/douglasneto/beatside/AccessibilityTest.kt` using `@RunWith(RobolectricTestRunner::class)` and `createComposeRule()` (Robolectric 4.14.1 — no emulator required; runs in the `android-test` CI job): verify "Next item", "Previous item", "Select", "Go back" custom actions present on the wheel; verify content descriptions on ring buttons; verify menu row descriptions include role/state (SC-004, FR-027, FR-028, FR-031) **Note**: Robolectric 4.14.x supports up to API 35; annotate the test class with `@Config(sdk = [35])` (or add `app/src/test/resources/robolectric.properties` with `sdk=35`) because the app compiles against API 37 and targets API 36.
 
-- [ ] T051 [P] Write XCUITest `ios/BeatSideUITests/AccessibilityUITests.swift` in the `BeatSideUITests` target (`bundle.ui-testing` added in T002): verify wheel's adjustable trait; verify four custom actions present; verify row accessibility labels include role and state; runs in `ios-ui-test` CI job (SC-004, FR-027, FR-028, FR-031)
+- [x] T051 [P] Write XCUITest `ios/BeatSideUITests/AccessibilityUITests.swift` in the `BeatSideUITests` target (`bundle.ui-testing` added in T002): verify wheel's adjustable trait; verify four custom actions present; verify row accessibility labels include role and state; runs in `ios-ui-test` CI job (SC-004, FR-027, FR-028, FR-031)
 
 - [ ] T052 Finalize `.github/workflows/ci.yml`: confirm `android-test` job runs T050 Robolectric tests via `./gradlew :app:testDebugUnitTest` (no emulator needed); confirm `ios-test` job runs unit tests; confirm `ios-ui-test` job runs `BeatSideUITests` scheme; add branch protection note in README (SC-004)
 

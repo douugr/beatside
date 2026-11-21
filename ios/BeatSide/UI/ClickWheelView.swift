@@ -4,6 +4,9 @@ import UIKit
 /// The wheel. Draws the ring and buttons, turns touches into `WheelEvent`s through a
 /// `WheelTracker`, plays feedback for each one with the current `settings`, then reports it
 /// through `onEvent`. It knows nothing about menus or screens (Constitution II).
+///
+/// Screen readers see the elements of `WheelTouchView`: an adjustable "Wheel" (swipe up/down =
+/// next/previous item) with four named actions, and the five labelled buttons (FR-027, FR-031).
 struct ClickWheelView: View {
     let settings: WheelSettings
     let onEvent: (WheelEvent) -> Void
@@ -11,12 +14,10 @@ struct ClickWheelView: View {
     var body: some View {
         ZStack {
             WheelFace()
+                .accessibilityHidden(true) // decorative; the touch surface carries the elements
             WheelTouchSurface(settings: settings, onEvent: onEvent)
         }
         .aspectRatio(1, contentMode: .fit)
-        // One element for UI tests; labels and the adjustable trait come in T046.
-        .accessibilityElement(children: .ignore)
-        .accessibilityIdentifier(Self.accessibilityID)
     }
 
     static let accessibilityID = "click_wheel"
@@ -93,11 +94,80 @@ final class WheelTouchView: UIView {
     private var gestureActive = false
     private var longPressTask: Task<Void, Never>?
 
+    private lazy var wheelElement = makeWheelElement()
+    private lazy var buttonElements: [(WheelButton, ButtonAccessibilityElement)] = makeButtonElements()
+
     init(feedback: FeedbackPlayer) {
         self.feedback = feedback
         super.init(frame: .zero)
         backgroundColor = .clear
         isMultipleTouchEnabled = false
+        accessibilityElements = [wheelElement] + buttonElements.map(\.1)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layoutAccessibilityElements()
+    }
+
+    // MARK: Accessibility (FR-027, FR-031)
+
+    /// Every accessibility action dispatches the same events, through the same feedback path, as
+    /// the matching gesture: a tick, a center press or a MENU press.
+    private func makeWheelElement() -> WheelAccessibilityElement {
+        let element = WheelAccessibilityElement(accessibilityContainer: self)
+        element.accessibilityLabel = String(localized: "a11y_wheel")
+        element.accessibilityIdentifier = ClickWheelView.accessibilityID
+        element.accessibilityTraits = .adjustable
+        element.onIncrement = { [weak self] in self?.dispatch([.tick(+1)]) }
+        element.onDecrement = { [weak self] in self?.dispatch([.tick(-1)]) }
+        let actions: [(String, WheelEvent)] = [
+            (String(localized: "a11y_action_next"), .tick(+1)),
+            (String(localized: "a11y_action_previous"), .tick(-1)),
+            (String(localized: "a11y_action_select"), .press(.center)),
+            (String(localized: "a11y_action_back"), .press(.menu)),
+        ]
+        element.accessibilityCustomActions = actions.map { name, event in
+            UIAccessibilityCustomAction(name: name) { [weak self] _ in
+                self?.dispatch([event])
+                return true
+            }
+        }
+        return element
+    }
+
+    private func makeButtonElements() -> [(WheelButton, ButtonAccessibilityElement)] {
+        let buttons: [(WheelButton, String)] = [
+            (.center, String(localized: "a11y_wheel_center")),
+            (.menu, String(localized: "a11y_wheel_menu")),
+            (.next, String(localized: "a11y_wheel_next")),
+            (.playPause, String(localized: "a11y_wheel_play_pause")),
+            (.previous, String(localized: "a11y_wheel_previous")),
+        ]
+        return buttons.map { button, label in
+            let element = ButtonAccessibilityElement(accessibilityContainer: self)
+            element.accessibilityLabel = label
+            element.accessibilityTraits = .button
+            element.onActivate = { [weak self] in self?.dispatch([.press(button)]) }
+            return (button, element)
+        }
+    }
+
+    /// Zones match the Android ButtonZone fractions: center circle, and a band on each side.
+    private func layoutAccessibilityElements() {
+        let w = bounds.width, h = bounds.height
+        wheelElement.accessibilityFrameInContainerSpace = bounds
+        for (button, element) in buttonElements {
+            let frame: CGRect
+            switch button {
+            case .center: frame = CGRect(x: w * 0.32, y: h * 0.32, width: w * 0.36, height: h * 0.36)
+            case .menu: frame = CGRect(x: w * 0.3, y: 0, width: w * 0.4, height: h * 0.3)
+            case .playPause: frame = CGRect(x: w * 0.3, y: h * 0.7, width: w * 0.4, height: h * 0.3)
+            case .next: frame = CGRect(x: w * 0.7, y: h * 0.3, width: w * 0.3, height: h * 0.4)
+            case .previous: frame = CGRect(x: 0, y: h * 0.3, width: w * 0.3, height: h * 0.4)
+            }
+            element.accessibilityFrameInContainerSpace = frame
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -179,5 +249,24 @@ final class WheelTouchView: UIView {
             feedback.play(event, settings: settings)
             onEvent(event)
         }
+    }
+}
+
+/// The whole wheel for VoiceOver: adjustable, so swipe up/down are next/previous item.
+final class WheelAccessibilityElement: UIAccessibilityElement {
+    var onIncrement: () -> Void = {}
+    var onDecrement: () -> Void = {}
+
+    override func accessibilityIncrement() { onIncrement() }
+    override func accessibilityDecrement() { onDecrement() }
+}
+
+/// One wheel button for VoiceOver; double-tap presses it.
+final class ButtonAccessibilityElement: UIAccessibilityElement {
+    var onActivate: () -> Void = {}
+
+    override func accessibilityActivate() -> Bool {
+        onActivate()
+        return true
     }
 }

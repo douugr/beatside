@@ -38,6 +38,8 @@ struct MenuStringsTests {
             "setting_on", "setting_off", "wheel_menu", "coming_soon", "press_menu_to_go_back",
             "about_version", "about_author",
             "a11y_wheel_center", "a11y_wheel_menu", "a11y_wheel_next", "a11y_wheel_previous", "a11y_wheel_play_pause",
+            "a11y_wheel", "a11y_action_next", "a11y_action_previous", "a11y_action_select", "a11y_action_back",
+            "a11y_row_submenu", "a11y_row_toggle", "a11y_screen_and_row",
         ].filter { !hasCatalogEntry($0) }
         #expect(missing.isEmpty, "UI keys with no Localizable.xcstrings entry: \(missing)")
     }

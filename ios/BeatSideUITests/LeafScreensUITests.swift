@@ -14,7 +14,7 @@ final class LeafScreensUITests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
-        wheel = app.otherElements["click_wheel"]
+        wheel = app.wheel
         XCTAssertTrue(wheel.waitForExistence(timeout: 5), "wheel not found")
     }
 
@@ -31,7 +31,7 @@ final class LeafScreensUITests: XCTestCase {
     }
 
     private func shows(_ text: String, file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertTrue(app.staticTexts[text].waitForExistence(timeout: 2), "expected \"\(text)\"", file: file, line: line)
+        XCTAssertTrue(app.labelled(text).waitForExistence(timeout: 2), "expected \"\(text)\"", file: file, line: line)
     }
 
     private func label(matching regex: String) -> XCUIElement {
