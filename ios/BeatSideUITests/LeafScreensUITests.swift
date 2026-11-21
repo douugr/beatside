@@ -42,7 +42,7 @@ final class LeafScreensUITests: XCTestCase {
         rotate(detents: 1) // Extras
         tapCenter()
         tapCenter() // Clock
-        let time = label(matching: #"\d{2}:\d{2}:\d{2}( (AM|PM))?"#)
+        let time = label(matching: #"\d{1,2}:\d{2}:\d{2}( (AM|PM))?"#)
         XCTAssertTrue(time.waitForExistence(timeout: 3), "no time label")
         let first = time.label
         let changed = expectation(for: NSPredicate(format: "label != %@", first), evaluatedWith: time)

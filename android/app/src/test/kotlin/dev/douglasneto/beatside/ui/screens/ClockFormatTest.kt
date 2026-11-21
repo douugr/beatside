@@ -16,13 +16,13 @@ class ClockFormatTest {
 
     @Test fun `24-hour setting uses HH mm ss`() = assertEquals("HH:mm:ss", ClockFormat.pattern(is24Hour = true))
 
-    @Test fun `12-hour setting uses hh mm ss with am pm`() = assertEquals("hh:mm:ss a", ClockFormat.pattern(is24Hour = false))
+    @Test fun `12-hour setting uses h mm ss with am pm and no leading zero`() = assertEquals("h:mm:ss a", ClockFormat.pattern(is24Hour = false))
 
     @Test fun `evening time in 24-hour format`() = assertEquals("19:05:09", fmt(19, 5, 9, is24Hour = true))
 
-    @Test fun `evening time in 12-hour format`() = assertEquals("07:05:09 PM", fmt(19, 5, 9, is24Hour = false))
+    @Test fun `evening time in 12-hour format`() = assertEquals("7:05:09 PM", fmt(19, 5, 9, is24Hour = false))
 
-    @Test fun `morning time in 12-hour format`() = assertEquals("09:30:00 AM", fmt(9, 30, 0, is24Hour = false))
+    @Test fun `morning time in 12-hour format`() = assertEquals("9:30:00 AM", fmt(9, 30, 0, is24Hour = false))
 
     @Test fun `midnight is 00 in 24-hour and 12 AM in 12-hour`() {
         assertEquals("00:00:00", fmt(0, 0, 0, is24Hour = true))

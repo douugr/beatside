@@ -198,7 +198,7 @@ class BeatSideAppTest {
     // US4 leaf screens (T036-T038): Clock and About are real; every other leaf is Coming soon.
 
     private val time24 = Regex("""\d{2}:\d{2}:\d{2}""")
-    private val time12 = Regex("""\d{2}:\d{2}:\d{2} (AM|PM)""")
+    private val time12 = Regex("""\d{1,2}:\d{2}:\d{2} (AM|PM)""")
 
     private fun textMatching(regex: Regex) = SemanticsMatcher("text matches $regex") { node ->
         node.config.getOrNull(SemanticsProperties.Text)?.any { regex.matches(it.text) } == true

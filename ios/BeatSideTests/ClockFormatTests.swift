@@ -20,17 +20,17 @@ struct ClockFormatTests {
         #expect(ClockFormat.pattern(uses24Hour: true) == "HH:mm:ss")
     }
 
-    @Test func twelveHourSettingUseshhmmssWithAmPm() {
-        #expect(ClockFormat.pattern(uses24Hour: false) == "hh:mm:ss a")
+    @Test func twelveHourSettingUsesHmmssWithAmPmAndNoLeadingZero() {
+        #expect(ClockFormat.pattern(uses24Hour: false) == "h:mm:ss a")
     }
 
     @Test func eveningTime() {
         #expect(fmt(19, 5, 9, uses24Hour: true) == "19:05:09")
-        #expect(fmt(19, 5, 9, uses24Hour: false) == "07:05:09 PM")
+        #expect(fmt(19, 5, 9, uses24Hour: false) == "7:05:09 PM")
     }
 
     @Test func morningTimeIn12Hour() {
-        #expect(fmt(9, 30, 0, uses24Hour: false) == "09:30:00 AM")
+        #expect(fmt(9, 30, 0, uses24Hour: false) == "9:30:00 AM")
     }
 
     @Test func midnightIs00In24HourAnd12AMIn12Hour() {

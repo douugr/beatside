@@ -5,7 +5,7 @@ import Foundation
 /// pattern. Twin of the Android ClockFormat.kt.
 enum ClockFormat {
     static let pattern24Hour = "HH:mm:ss"
-    static let pattern12Hour = "hh:mm:ss a"
+    static let pattern12Hour = "h:mm:ss a"
 
     static func pattern(uses24Hour: Bool) -> String {
         uses24Hour ? pattern24Hour : pattern12Hour

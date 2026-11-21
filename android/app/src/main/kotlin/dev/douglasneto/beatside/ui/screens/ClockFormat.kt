@@ -10,7 +10,7 @@ import java.util.Locale
  */
 object ClockFormat {
     const val PATTERN_24_HOUR = "HH:mm:ss"
-    const val PATTERN_12_HOUR = "hh:mm:ss a"
+    const val PATTERN_12_HOUR = "h:mm:ss a"
 
     fun pattern(is24Hour: Boolean): String = if (is24Hour) PATTERN_24_HOUR else PATTERN_12_HOUR
 
