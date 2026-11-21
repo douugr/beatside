@@ -6,7 +6,7 @@
 
 ## 1. Toolchain Versions
 
-### Decision: Start with the prototype's candidate toolchain (unverified — build must be confirmed)
+### Decision: Use the prototype's toolchain (verified 2026-11-21)
 
 The `prototype/wheel-and-menus` branch contains an Android Gradle project that was **never
 compiled**. Its `libs.versions.toml` and Gradle wrapper pins were chosen deliberately for AGP 9
@@ -14,7 +14,11 @@ compiled**. Its `libs.versions.toml` and Gradle wrapper pins were chosen deliber
 below are candidates; task T001a verifies them by running `./gradlew :app:assembleDebug` and
 updating this table with the actual working versions.
 
-| Component | Candidate version | Notes |
+**✅ Verified (T001a, 2026-11-21)**: `./gradlew :app:assembleDebug` produced `app-debug.apk` and
+`./gradlew :app:testDebugUnitTest` ran 42 tests (0 failures) on macOS with every version below
+unchanged. The candidates are now the confirmed working versions.
+
+| Component | Version (verified) | Notes |
 |---|---|---|
 | Android Gradle Plugin | 9.4.1 | AGP 9 compiles Kotlin itself; no `kotlin-android` plugin needed |
 | Kotlin | 2.3.0 | Must match the version AGP 9.4.1 resolves internally; also drives the Compose compiler plugin |
@@ -25,7 +29,7 @@ updating this table with the actual working versions.
 | `minSdk` | 26 | Specified in the feature requirements |
 | `activity-compose` | 1.10.1 | From prototype |
 | `core-ktx` | 1.16.0 | From prototype |
-| `robolectric` | 4.14.1 | For Compose semantics tests in the unit-test job (T050) |
+| `robolectric` | 4.14.1 | For Compose semantics tests in the unit-test job (T050); supports up to API 35, so tests run with `@Config(sdk = [35])` |
 | iOS deployment target | 17.0 | Specified; covers `sensoryFeedback` and Swift 6 |
 | Swift language mode | 6.0 | Specified; enforced via `SWIFT_VERSION = 6.0` in project.yml |
 | XcodeGen | latest stable | Generates `ios/BeatSide.xcodeproj`; not committed |
