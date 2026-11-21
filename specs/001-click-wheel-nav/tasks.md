@@ -209,7 +209,7 @@
 
 - [x] T051 [P] Write XCUITest `ios/BeatSideUITests/AccessibilityUITests.swift` in the `BeatSideUITests` target (`bundle.ui-testing` added in T002): verify wheel's adjustable trait; verify four custom actions present; verify row accessibility labels include role and state; runs in `ios-ui-test` CI job (SC-004, FR-027, FR-028, FR-031)
 
-- [ ] T052 Finalize `.github/workflows/ci.yml`: confirm `android-test` job runs T050 Robolectric tests via `./gradlew :app:testDebugUnitTest` (no emulator needed); confirm `ios-test` job runs unit tests; confirm `ios-ui-test` job runs `BeatSideUITests` scheme; add branch protection note in README (SC-004)
+- [x] T052 Finalize `.github/workflows/ci.yml`: confirm `android-test` job runs T050 Robolectric tests via `./gradlew :app:testDebugUnitTest` (no emulator needed); confirm `ios-test` job runs unit tests; confirm `ios-ui-test` job runs `BeatSideUITests` scheme; add branch protection note in README (SC-004)
 
 - [ ] T053 [P] Run `quickstart.md` acceptance checklist end-to-end on both platforms: verify SC-001 (≤10 gestures to any leaf), SC-002 (unit test D-1 passes), SC-003 (settings instant), SC-004 (accessibility tests green), SC-005 (pt-BR strings present), SC-006 (Clock format), SC-007 (screen-reader navigation)
 

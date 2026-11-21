@@ -36,6 +36,24 @@ beatside/
 └── .specify/   Spec Kit templates, scripts and constitution
 ```
 
+## Tests and CI
+
+Every pull request to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+| Job | What it runs |
+|---|---|
+| Android unit tests (+ Robolectric Compose) | `./gradlew :app:testDebugUnitTest`: JUnit for the pure logic plus Robolectric (API 35) for the Compose UI and accessibility tests. The Gradle daemon is pinned to JDK 21. |
+| iOS unit tests | `xcodebuild test -scheme BeatSide`: Swift Testing for the pure logic, wiring and String Catalog checks. |
+| iOS UI/accessibility tests | `xcodebuild test -scheme BeatSideUITests`: XCUITest, including an accessibility audit and a pt-BR launch. |
+
+To run them locally: `cd android && ./gradlew :app:testDebugUnitTest`, and
+`cd ios && xcodegen generate` and then run the `BeatSide` and `BeatSideUITests` schemes in Xcode
+(or `xcodebuild test`).
+
+**Branch protection.** In the repository settings, protect `main` and mark these three jobs as
+required status checks, so a pull request can't be merged unless every platform's tests pass
+(constitution, Development Workflow).
+
 ## Trademarks
 
 BeatSide is an independent project. It is not affiliated with, endorsed by or
