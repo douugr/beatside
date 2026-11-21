@@ -55,11 +55,11 @@
 
 ### Android Menu Core
 
-- [ ] T010 Write `android/app/src/test/kotlin/dev/douglasneto/beatside/menu/MenuNavigatorTest.kt` covering all rows of the MenuNavigator behavioral table in `data-model.md` (Tick clamping, Center→Submenu, Center→Toggle→ToggleSetting effect, Press(Menu)→back, Press(Menu) at root no-op, Screen→Unhandled, non-Center/Menu Press→Unhandled, LongPress→Unhandled) — confirm all fail
+- [x] T010 Write `android/app/src/test/kotlin/dev/douglasneto/beatside/menu/MenuNavigatorTest.kt` covering all rows of the MenuNavigator behavioral table in `data-model.md` (Tick clamping, Center→Submenu, Center→Toggle→ToggleSetting effect, Press(Menu)→back, Press(Menu) at root no-op, Screen→Unhandled, non-Center/Menu Press→Unhandled, LongPress→Unhandled) — confirm all fail
 
-- [ ] T011 Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/menu/MenuNode.kt` (sealed: Submenu, Screen, Toggle; each with `titleKey: String` per `data-model.md` MenuNode — NOT `title: String`), `Route.kt` (enum: ComingSoon, NowPlaying, ShuffleSongs, Clock, About per `data-model.md` Route), `SettingKey.kt` (enum: Clicker, Haptics per `data-model.md` SettingKey), `MenuFrame.kt`, `MenuState.kt`, `MenuEffect.kt` (sealed: ToggleSetting, Unhandled per `data-model.md` MenuEffect), `BeatSideMenu.kt` (static tree using `titleKey` string constants per `data-model.md` BeatSideMenu, e.g. `titleKey = "beatside"`, `titleKey = "menu_music"`, etc.), `MenuNavigator.kt` (pure reducer per `data-model.md` MenuNavigator contract) — run T010 tests and confirm all pass
+- [x] T011 Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/menu/MenuNode.kt` (sealed: Submenu, Screen, Toggle; each with `titleKey: String` per `data-model.md` MenuNode — NOT `title: String`), `Route.kt` (enum: ComingSoon, NowPlaying, ShuffleSongs, Clock, About per `data-model.md` Route), `SettingKey.kt` (enum: Clicker, Haptics per `data-model.md` SettingKey), `MenuFrame.kt`, `MenuState.kt`, `MenuEffect.kt` (sealed: ToggleSetting, Unhandled per `data-model.md` MenuEffect), `BeatSideMenu.kt` (static tree using `titleKey` string constants per `data-model.md` BeatSideMenu, e.g. `titleKey = "beatside"`, `titleKey = "menu_music"`, etc.), `MenuNavigator.kt` (pure reducer per `data-model.md` MenuNavigator contract) — run T010 tests and confirm all pass
 
-- [ ] T012 [P] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/settings/WheelSettings.kt` (data class: `clickerEnabled: Boolean = true`, `hapticsEnabled: Boolean = true`, `toggled(key)` method per `data-model.md` WheelSettings; session-only, no persistence — FR-030)
+- [x] T012 [P] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/settings/WheelSettings.kt` (data class: `clickerEnabled: Boolean = true`, `hapticsEnabled: Boolean = true`, `toggled(key)` method per `data-model.md` WheelSettings; session-only, no persistence — FR-030)
 
 ### iOS Menu Core (parallel with T010–T012)
 
