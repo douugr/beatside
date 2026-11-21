@@ -23,11 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.douglasneto.beatside.menu.MenuNode
 import dev.douglasneto.beatside.menu.MenuState
+import dev.douglasneto.beatside.menu.Route
+import dev.douglasneto.beatside.ui.screens.ComingSoonScreen
 import dev.douglasneto.beatside.settings.WheelSettings
 
 /**
  * The display: a title bar with the current node's title, then its content. Submenus show
- * their rows; leaf screens show a placeholder until RouteScreen lands in T027.
+ * their rows; leaf screens are drawn by [RouteScreen].
  */
 @Composable
 fun LcdScreen(state: MenuState, settings: WheelSettings, modifier: Modifier = Modifier) {
@@ -60,7 +62,18 @@ fun LcdScreen(state: MenuState, settings: WheelSettings, modifier: Modifier = Mo
             is MenuNode.Submenu -> key(state.stack.size) {
                 MenuListContent(node, frame.selectedIndex, settings)
             }
-            is MenuNode.Screen, is MenuNode.Toggle -> Box(Modifier.fillMaxSize())
+            is MenuNode.Screen -> RouteScreen(node.route)
+            // Toggles are never pushed onto the stack (MenuNavigator emits ToggleSetting instead).
+            is MenuNode.Toggle -> Box(Modifier.fillMaxSize())
         }
+    }
+}
+
+/** Draws the leaf screen for [route]. Every route is a placeholder until Phase 6 (T038). */
+@Composable
+private fun RouteScreen(route: Route) {
+    when (route) {
+        Route.ComingSoon, Route.NowPlaying, Route.ShuffleSongs, Route.Clock, Route.About ->
+            ComingSoonScreen()
     }
 }

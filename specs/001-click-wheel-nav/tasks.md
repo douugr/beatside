@@ -117,9 +117,9 @@
 
 ### Android — US2
 
-- [ ] T026 [US2] Wire `Press(Center)` and `Press(Menu)` events in `android/app/src/main/kotlin/dev/douglasneto/beatside/BeatSideApp.kt`: `MenuNavigator.reduce(state, Press(Center))` enters items; `MenuNavigator.reduce(state, Press(Menu))` goes back; add `BackHandler(enabled = state.canGoBack) { /* Press(Menu) */ }` for system back gesture (FR-012, FR-013, FR-014 — Android only)
+- [x] T026 [US2] Wire `Press(Center)` and `Press(Menu)` events in `android/app/src/main/kotlin/dev/douglasneto/beatside/BeatSideApp.kt`: `MenuNavigator.reduce(state, Press(Center))` enters items; `MenuNavigator.reduce(state, Press(Menu))` goes back; add `BackHandler(enabled = state.canGoBack) { /* Press(Menu) */ }` for system back gesture (FR-012, FR-013, FR-014 — Android only)
 
-- [ ] T027 [US2] Add `RouteScreen` composable to `android/app/src/main/kotlin/dev/douglasneto/beatside/ui/LcdScreen.kt` routing `MenuNode.Screen` nodes to their leaf screen by `Route` value; for now all routes render `ComingSoonScreen.kt` stub (`CenteredMessage(stringResource(R.string.coming_soon), stringResource(R.string.press_menu_to_go_back))`) — FR-023, FR-026
+- [x] T027 [US2] Add `RouteScreen` composable to `android/app/src/main/kotlin/dev/douglasneto/beatside/ui/LcdScreen.kt` routing `MenuNode.Screen` nodes to their leaf screen by `Route` value; for now all routes render `ComingSoonScreen.kt` stub (`CenteredMessage(stringResource(R.string.coming_soon), stringResource(R.string.press_menu_to_go_back))`) — FR-023, FR-026
 
 ### iOS — US2 (parallel with T026–T027)
 
