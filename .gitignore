@@ -48,3 +48,7 @@ xcuserdata/
 .swiftpm/
 Packages/
 Package.resolved
+
+# ---------- Claude Code ----------
+# Spec Kit skills in .claude/skills are shared; personal settings are not.
+.claude/settings.local.json
