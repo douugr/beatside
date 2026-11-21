@@ -95,15 +95,15 @@
 
 ### iOS — US1 (parallel with T016–T020)
 
-- [ ] T021 [P] [US1] Implement `ios/BeatSide/UI/ClickWheelView.swift`: `UIViewRepresentable` (or `Canvas`+gesture) forwarding `UITouch` events to `WheelTracker`; long-press `DispatchWorkItem` after 500 ms; drawing layer (ring, center button, button labels); dispatches `WheelEvent`s via callback closure; no feedback yet — `FeedbackPlayer` wired in T033 (Phase 5)
+- [x] T021 [P] [US1] Implement `ios/BeatSide/UI/ClickWheelView.swift`: `UIViewRepresentable` (or `Canvas`+gesture) forwarding `UITouch` events to `WheelTracker`; long-press `DispatchWorkItem` after 500 ms; drawing layer (ring, center button, button labels); dispatches `WheelEvent`s via callback closure; no feedback yet — `FeedbackPlayer` wired in T033 (Phase 5)
 
-- [ ] T022 [P] [US1] Implement `ios/BeatSide/UI/MenuListView.swift`: `List` or `ScrollViewReader`+`ForEach` showing `MenuNode.Submenu` children; highlighted row; suffix "›" / "On" / "Off" (FR-017); scroll-to-visible on `selectedIndex` change (FR-016); row label resolved via `String(localized: child.titleKey)` — NOT `child.titleKey` literally (FR-029, `data-model.md` MenuNode.titleKey)
+- [x] T022 [P] [US1] Implement `ios/BeatSide/UI/MenuListView.swift`: `List` or `ScrollViewReader`+`ForEach` showing `MenuNode.Submenu` children; highlighted row; suffix "›" / "On" / "Off" (FR-017); scroll-to-visible on `selectedIndex` change (FR-016); row label resolved via `String(localized: child.titleKey)` — NOT `child.titleKey` literally (FR-029, `data-model.md` MenuNode.titleKey)
 
-- [ ] T023 [P] [US1] Implement `ios/BeatSide/UI/LcdView.swift`: title bar resolved via `String(localized: frame.node.titleKey)` + `MenuListView` for Submenu, placeholder `EmptyView` for Screen; retro styling (FR-001, FR-002)
+- [x] T023 [P] [US1] Implement `ios/BeatSide/UI/LcdView.swift`: title bar resolved via `String(localized: frame.node.titleKey)` + `MenuListView` for Submenu, placeholder `EmptyView` for Screen; retro styling (FR-001, FR-002)
 
-- [ ] T024 [P] [US1] Implement `ios/BeatSide/UI/BeatSideView.swift`: root `View` holding `@State` `MenuState` and `WheelSettings`; routes `Tick` → `MenuNavigator.reduce`; routes `ToggleSetting` → `WheelSettings.toggled`; `VStack` with `LcdView` + `ClickWheelView` (portrait)
+- [x] T024 [P] [US1] Implement `ios/BeatSide/UI/BeatSideView.swift`: root `View` holding `@State` `MenuState` and `WheelSettings`; routes `Tick` → `MenuNavigator.reduce`; routes `ToggleSetting` → `WheelSettings.toggled`; `VStack` with `LcdView` + `ClickWheelView` (portrait)
 
-- [ ] T025 [P] [US1] Implement `ios/BeatSide/BeatSideApp.swift`: `@main App` struct with `WindowGroup { BeatSideView() }`; portrait-only locked in `project.yml` via `UIInterfaceOrientationPortrait`
+- [x] T025 [P] [US1] Implement `ios/BeatSide/BeatSideApp.swift`: `@main App` struct with `WindowGroup { BeatSideView() }`; portrait-only locked in `project.yml` via `UIInterfaceOrientationPortrait`
 
 **Checkpoint**: App launches on Android emulator and iOS simulator. Rotating the wheel on the root menu scrolls the selection. At boundaries, selection stays clamped. `xcodegen generate` still works. (Click + haptic not expected until Phase 5.)
 
