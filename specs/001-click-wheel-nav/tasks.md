@@ -83,15 +83,15 @@
 
 ### Android — US1
 
-- [ ] T016 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/wheel/ClickWheel.kt`: Compose `Box` with `pointerInput` forwarding touch events to `WheelTracker`; long-press timeout coroutine (`withTimeoutOrNull(500)`); `Canvas` drawing (ring gradient, center button, MENU/Next/Previous/PlayPause labels); dispatch `WheelEvent`s via callback; no feedback yet — `FeedbackPlayer` wired in T031 (Phase 5) (FR-001, FR-003–FR-010)
+- [x] T016 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/wheel/ClickWheel.kt`: Compose `Box` with `pointerInput` forwarding touch events to `WheelTracker`; long-press timeout coroutine (`withTimeoutOrNull(500)`); `Canvas` drawing (ring gradient, center button, MENU/Next/Previous/PlayPause labels); dispatch `WheelEvent`s via callback; no feedback yet — `FeedbackPlayer` wired in T031 (Phase 5) (FR-001, FR-003–FR-010)
 
-- [ ] T017 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/ui/MenuListContent.kt`: `LazyColumn` with `itemsIndexed`; highlighted row styled with selection gradient; row suffix "›" for Submenu/Screen, "On"/"Off" for Toggle (FR-017); `LaunchedEffect(selectedIndex)` scroll-to-visible logic (FR-016); row label resolved via `stringResource(child.titleKey)` — NOT `child.title` (FR-029, `data-model.md` MenuNode.titleKey)
+- [x] T017 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/ui/MenuListContent.kt`: `LazyColumn` with `itemsIndexed`; highlighted row styled with selection gradient; row suffix "›" for Submenu/Screen, "On"/"Off" for Toggle (FR-017); `LaunchedEffect(selectedIndex)` scroll-to-visible logic (FR-016); row label resolved via `stringResource(child.titleKey)` — NOT `child.title` (FR-029, `data-model.md` MenuNode.titleKey)
 
-- [ ] T018 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/ui/LcdScreen.kt`: title bar resolved via `stringResource(frame.node.titleKey)` + `MenuListContent` for Submenu nodes, placeholder `Box` for Screen nodes; border + background per retro aesthetic (FR-001, FR-002)
+- [x] T018 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/ui/LcdScreen.kt`: title bar resolved via `stringResource(frame.node.titleKey)` + `MenuListContent` for Submenu nodes, placeholder `Box` for Screen nodes; border + background per retro aesthetic (FR-001, FR-002)
 
-- [ ] T019 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/BeatSideApp.kt`: root composable holding `MenuState` and `WheelSettings` as `remember`/`mutableStateOf`; passes `Tick` events from `ClickWheel.onEvent` through `MenuNavigator.reduce`; passes `ToggleSetting` effects to `WheelSettings.toggled`; wires `ClickWheel` + `LcdScreen` in a `Column` (portrait, FR-001)
+- [x] T019 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/BeatSideApp.kt`: root composable holding `MenuState` and `WheelSettings` as `remember`/`mutableStateOf`; passes `Tick` events from `ClickWheel.onEvent` through `MenuNavigator.reduce`; passes `ToggleSetting` effects to `WheelSettings.toggled`; wires `ClickWheel` + `LcdScreen` in a `Column` (portrait, FR-001)
 
-- [ ] T020 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/MainActivity.kt`: `ComponentActivity` with `setContent { BeatSideApp() }`; apply portrait-only orientation lock in `AndroidManifest.xml`
+- [x] T020 [US1] Implement `android/app/src/main/kotlin/dev/douglasneto/beatside/MainActivity.kt`: `ComponentActivity` with `setContent { BeatSideApp() }`; apply portrait-only orientation lock in `AndroidManifest.xml`
 
 ### iOS — US1 (parallel with T016–T020)
 
