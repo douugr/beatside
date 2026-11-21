@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,7 +56,10 @@ fun LcdScreen(state: MenuState, settings: WheelSettings, modifier: Modifier = Mo
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(LcdColors.Border))
         when (val node = frame.node) {
-            is MenuNode.Submenu -> MenuListContent(node, frame.selectedIndex, settings)
+            // A new list (fresh scroll position) per stack level.
+            is MenuNode.Submenu -> key(state.stack.size) {
+                MenuListContent(node, frame.selectedIndex, settings)
+            }
             is MenuNode.Screen, is MenuNode.Toggle -> Box(Modifier.fillMaxSize())
         }
     }
