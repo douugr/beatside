@@ -53,6 +53,10 @@ schemes:
         BeatSide: all
         BeatSideTests: [test]
     test:
+      # Unit tests assert English strings; pin the language so a simulator set to another
+      # language (e.g. pt-BR) gives the same results. pt-BR is checked explicitly.
+      language: en
+      region: US
       targets:
         - BeatSideTests
   BeatSideUITests:

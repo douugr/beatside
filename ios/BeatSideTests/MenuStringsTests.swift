@@ -49,4 +49,31 @@ struct MenuStringsTests {
         #expect(MenuStrings.title(for: .screen(titleKey: "menu_about", route: .about))
             == Bundle.main.localizedString(forKey: "menu_about", value: nil, table: "Localizable"))
     }
+
+    // MARK: SC-005 / FR-029: Brazilian Portuguese
+
+    private func placeholders(_ text: String) -> [String] {
+        text.matches(of: /%(\d+\$)?[@d]/).map { String($0.output.0) }.sorted()
+    }
+
+    @Test func everyEnglishKeyHasABrazilianPortugueseValueWithTheSamePlaceholders() throws {
+        let englishURL = try #require(Bundle.main.url(forResource: "Localizable", withExtension: "strings",
+                                                      subdirectory: nil, localization: "en"))
+        let english = try #require(NSDictionary(contentsOf: englishURL) as? [String: String])
+        #expect(english.count >= 37, "compiled English table looks incomplete: \(english.count) keys")
+
+        let portuguesePath = try #require(Bundle.main.path(forResource: "pt-BR", ofType: "lproj"), "no pt-BR.lproj in the app")
+        let portuguese = try #require(Bundle(path: portuguesePath))
+
+        var missing: [String] = []
+        for (key, englishValue) in english {
+            let value = portuguese.localizedString(forKey: key, value: missingSentinel, table: "Localizable")
+            if value == missingSentinel || value.isEmpty {
+                missing.append(key)
+            } else {
+                #expect(placeholders(value) == placeholders(englishValue), "placeholders of \(key)")
+            }
+        }
+        #expect(missing.isEmpty, "keys with no pt-BR value: \(missing.sorted())")
+    }
 }

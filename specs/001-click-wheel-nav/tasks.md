@@ -203,7 +203,7 @@
 
 - [x] T048 Add Brazilian Portuguese translations to `android/app/src/main/res/values-pt-rBR/strings.xml` for every key in `values/strings.xml` (menu item titles, screen titles, button labels, accessibility labels, placeholder messages) (FR-029, SC-005)
 
-- [ ] T049 [P] Add Brazilian Portuguese translations to `ios/BeatSide/Resources/Localizable.xcstrings` for every key added in T043 (FR-029, SC-005)
+- [x] T049 [P] Add Brazilian Portuguese translations to `ios/BeatSide/Resources/Localizable.xcstrings` for every key added in T043 (FR-029, SC-005)
 
 - [x] T050 [P] Write Compose accessibility test `android/app/src/test/kotlin/dev/douglasneto/beatside/AccessibilityTest.kt` using `@RunWith(RobolectricTestRunner::class)` and `createComposeRule()` (Robolectric 4.14.1 — no emulator required; runs in the `android-test` CI job): verify "Next item", "Previous item", "Select", "Go back" custom actions present on the wheel; verify content descriptions on ring buttons; verify menu row descriptions include role/state (SC-004, FR-027, FR-028, FR-031) **Note**: Robolectric 4.14.x supports up to API 35; annotate the test class with `@Config(sdk = [35])` (or add `app/src/test/resources/robolectric.properties` with `sdk=35`) because the app compiles against API 37 and targets API 36.
 

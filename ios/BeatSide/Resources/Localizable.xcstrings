@@ -9,6 +9,12 @@
             "state" : "translated",
             "value" : "BeatSide"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BeatSide"
+          }
         }
       }
     },
@@ -20,6 +26,12 @@
             "state" : "translated",
             "value" : "Music"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Música"
+          }
         }
       }
     },
@@ -27,6 +39,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlists"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Playlists"
@@ -42,6 +60,12 @@
             "state" : "translated",
             "value" : "Artists"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artistas"
+          }
         }
       }
     },
@@ -52,6 +76,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Albums"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Álbuns"
           }
         }
       }
@@ -64,6 +94,12 @@
             "state" : "translated",
             "value" : "Songs"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Músicas"
+          }
         }
       }
     },
@@ -75,6 +111,12 @@
             "state" : "translated",
             "value" : "Genres"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gêneros"
+          }
         }
       }
     },
@@ -82,6 +124,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extras"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Extras"
@@ -97,6 +145,12 @@
             "state" : "translated",
             "value" : "Clock"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relógio"
+          }
         }
       }
     },
@@ -107,6 +161,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stopwatch"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cronômetro"
           }
         }
       }
@@ -119,6 +179,12 @@
             "state" : "translated",
             "value" : "Games"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jogos"
+          }
         }
       }
     },
@@ -129,6 +195,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurações"
           }
         }
       }
@@ -141,6 +213,12 @@
             "state" : "translated",
             "value" : "Clicker"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clique"
+          }
         }
       }
     },
@@ -151,6 +229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Haptics"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vibração"
           }
         }
       }
@@ -163,6 +247,12 @@
             "state" : "translated",
             "value" : "About"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre"
+          }
         }
       }
     },
@@ -173,6 +263,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shuffle Songs"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Músicas aleatórias"
           }
         }
       }
@@ -185,6 +281,12 @@
             "state" : "translated",
             "value" : "Now Playing"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocando agora"
+          }
         }
       }
     },
@@ -195,6 +297,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "On"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligado"
           }
         }
       }
@@ -207,6 +315,12 @@
             "state" : "translated",
             "value" : "Off"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desligado"
+          }
         }
       }
     },
@@ -214,6 +328,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MENU"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "MENU"
@@ -229,6 +349,12 @@
             "state" : "translated",
             "value" : "Coming soon"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em breve"
+          }
         }
       }
     },
@@ -239,6 +365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Press MENU to go back."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pressione MENU para voltar."
           }
         }
       }
@@ -251,6 +383,12 @@
             "state" : "translated",
             "value" : "Version %@"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versão %@"
+          }
         }
       }
     },
@@ -261,6 +399,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "by Douglas Rodrigues Neto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "por Douglas Rodrigues Neto"
           }
         }
       }
@@ -273,6 +417,12 @@
             "state" : "translated",
             "value" : "Select button"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Botão Selecionar"
+          }
         }
       }
     },
@@ -283,6 +433,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Menu button"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Botão Menu"
           }
         }
       }
@@ -295,6 +451,12 @@
             "state" : "translated",
             "value" : "Next button"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Botão Próxima"
+          }
         }
       }
     },
@@ -305,6 +467,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Previous button"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Botão Anterior"
           }
         }
       }
@@ -317,6 +485,12 @@
             "state" : "translated",
             "value" : "Play/Pause button"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Botão Tocar/Pausar"
+          }
         }
       }
     },
@@ -327,6 +501,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wheel"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roda"
           }
         }
       }
@@ -339,6 +519,12 @@
             "state" : "translated",
             "value" : "Next item"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Próximo item"
+          }
         }
       }
     },
@@ -349,6 +535,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Previous item"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Item anterior"
           }
         }
       }
@@ -361,6 +553,12 @@
             "state" : "translated",
             "value" : "Select"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionar"
+          }
         }
       }
     },
@@ -372,6 +570,12 @@
             "state" : "translated",
             "value" : "Go back"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voltar"
+          }
         }
       }
     },
@@ -379,6 +583,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, submenu"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@, submenu"
@@ -394,6 +604,12 @@
             "state" : "translated",
             "value" : "%1$@, %2$@"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
         }
       }
     },
@@ -401,6 +617,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@, %2$@"
