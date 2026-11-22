@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  android-test:
+    name: Android unit tests (+ Robolectric Compose)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Run Android unit tests
+        working-directory: android
+        run: ./gradlew :app:testDebugUnitTest --no-daemon
+
+  ios-test:
+    name: iOS unit tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+      - name: Run iOS unit tests
+        working-directory: ios
+        run: |
+          set -o pipefail
+          # Pick an iPhone on the newest installed iOS runtime, by id. A name-only destination
+          # means OS:latest and fails when that model is missing from the latest runtime.
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((k for k in data if "iOS" in k), key=lambda k: [int(x) for x in k.rsplit("iOS-", 1)[1].split("-")])
+          phones = [d for d in data[ios[-1]] if d["name"].startswith("iPhone")]
+          print(phones[0]["udid"])')
+          echo "Using simulator: $DEVICE_ID"
+          xcodebuild test \
+            -project BeatSide.xcodeproj \
+            -scheme BeatSide \
+            -destination "id=$DEVICE_ID"
+
+  ios-ui-test:
+    name: iOS UI/accessibility tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+      - name: Run iOS UI tests
+        working-directory: ios
+        run: |
+          set -o pipefail
+          # Pick an iPhone on the newest installed iOS runtime, by id. A name-only destination
+          # means OS:latest and fails when that model is missing from the latest runtime.
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((k for k in data if "iOS" in k), key=lambda k: [int(x) for x in k.rsplit("iOS-", 1)[1].split("-")])
+          phones = [d for d in data[ios[-1]] if d["name"].startswith("iPhone")]
+          print(phones[0]["udid"])')
+          echo "Using simulator: $DEVICE_ID"
+          xcodebuild test \
+            -project BeatSide.xcodeproj \
+            -scheme BeatSideUITests \
+            -destination "id=$DEVICE_ID"

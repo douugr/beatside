@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brazilian Portuguese (FR-029). Keep keys in sync with values/strings.xml; TranslationsTest checks. -->
+
+    <!-- Menu tree titles -->
+    <string name="menu_music">Música</string>
+    <string name="menu_playlists">Playlists</string>
+    <string name="menu_artists">Artistas</string>
+    <string name="menu_albums">Álbuns</string>
+    <string name="menu_songs">Músicas</string>
+    <string name="menu_genres">Gêneros</string>
+    <string name="menu_extras">Extras</string>
+    <string name="menu_clock">Relógio</string>
+    <string name="menu_stopwatch">Cronômetro</string>
+    <string name="menu_games">Jogos</string>
+    <string name="menu_settings">Configurações</string>
+    <string name="menu_clicker">Clique</string>
+    <string name="menu_haptics">Vibração</string>
+    <string name="menu_about">Sobre</string>
+    <string name="menu_shuffle_songs">Músicas aleatórias</string>
+    <string name="menu_now_playing">Tocando agora</string>
+
+    <!-- Toggle row state -->
+    <string name="setting_on">Ligado</string>
+    <string name="setting_off">Desligado</string>
+
+    <!-- Placeholder leaf screen -->
+    <string name="coming_soon">Em breve</string>
+    <string name="press_menu_to_go_back">Pressione MENU para voltar.</string>
+
+    <!-- About screen -->
+    <string name="about_version">Versão %1$s</string>
+    <string name="about_author">por Douglas Rodrigues Neto</string>
+
+    <!-- Accessibility labels for the wheel buttons -->
+    <string name="a11y_wheel_center">Botão Selecionar</string>
+    <string name="a11y_wheel_menu">Botão Menu</string>
+    <string name="a11y_wheel_next">Botão Próxima</string>
+    <string name="a11y_wheel_previous">Botão Anterior</string>
+    <string name="a11y_wheel_play_pause">Botão Tocar/Pausar</string>
+
+    <!-- Screen-reader label of the whole wheel and its four actions -->
+    <string name="a11y_wheel">Roda</string>
+    <string name="a11y_action_next">Próximo item</string>
+    <string name="a11y_action_previous">Item anterior</string>
+    <string name="a11y_action_select">Selecionar</string>
+    <string name="a11y_action_back">Voltar</string>
+
+    <!-- Screen-reader row labels and announcements -->
+    <string name="a11y_row_submenu">%1$s, submenu</string>
+    <string name="a11y_row_toggle">%1$s, %2$s</string>
+    <string name="a11y_screen_and_row">%1$s, %2$s</string>
+
+    <!-- Label printed on the top of the wheel ring (the button's name, kept as on the device) -->
+    <string name="wheel_menu">MENU</string>
+</resources>
